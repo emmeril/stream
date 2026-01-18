@@ -1,320 +1,597 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Live Streaming App - Home</title>
+    <title>LiveStream - Streaming YouTube Music</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        * { font-family: 'Poppins', sans-serif; }
+        
         .gradient-bg {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
         .stream-card {
             transition: all 0.3s ease;
+            background: linear-gradient(145deg, #1f2937, #111827);
+            border: 1px solid #374151;
         }
+        
         .stream-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: #4f46e5;
         }
-        .pulse {
+        
+        .live-indicator {
             animation: pulse 2s infinite;
         }
+        
         @keyframes pulse {
-            0% { opacity: 1; }
+            0%, 100% { opacity: 1; }
             50% { opacity: 0.5; }
-            100% { opacity: 1; }
+        }
+        
+        .music-wave {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 50px;
+        }
+        
+        .music-wave span {
+            display: block;
+            width: 3px;
+            height: 20px;
+            background: #4f46e5;
+            margin: 0 2px;
+            border-radius: 3px;
+            animation: musicWave 1.2s infinite ease-in-out;
+        }
+        
+        .music-wave span:nth-child(2) { animation-delay: -1.1s; }
+        .music-wave span:nth-child(3) { animation-delay: -1.0s; }
+        .music-wave span:nth-child(4) { animation-delay: -0.9s; }
+        .music-wave span:nth-child(5) { animation-delay: -0.8s; }
+        
+        @keyframes musicWave {
+            0%, 40%, 100% { transform: scaleY(0.4); }
+            20% { transform: scaleY(1); }
+        }
+        
+        .loading-spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid #4f46e5;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body class="bg-gray-900 text-white">
     <div x-data="homeApp()" x-init="init()">
-        <!-- Navigation -->
-        <nav class="bg-gray-800 border-b border-gray-700">
+        <!-- Navigation Bar -->
+        <nav class="glass-effect fixed w-full z-50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16">
+                    <!-- Logo -->
                     <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-broadcast-tower text-2xl text-blue-400"></i>
-                            <span class="ml-2 text-xl font-bold">LiveStream</span>
-                        </div>
-                        <div class="hidden md:block">
-                            <div class="ml-10 flex items-baseline space-x-4">
-                                <a href="/" class="bg-gray-900 text-white px-3 py-2 rounded-md text-sm font-medium">
-                                    <i class="fas fa-home mr-1"></i> Home
-                                </a>
-                                <a href="/broadcaster.html" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-                                    <i class="fas fa-video mr-1"></i> Go Live
-                                </a>
-                                <a href="/viewer.html" class="text-gray-300 hover:bg-gray-700 hover:text-white px-3 py-2 rounded-md text-sm font-medium">
-                                    <i class="fas fa-eye mr-1"></i> Watch
-                                </a>
+                        <div class="flex items-center space-x-2">
+                            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-broadcast-tower text-white"></i>
+                            </div>
+                            <div>
+                                <h1 class="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
+                                    LiveStream
+                                </h1>
+                                <p class="text-xs text-gray-400">YouTube Music Streaming</p>
                             </div>
                         </div>
                     </div>
-                    <div class="flex items-center space-x-4">
-                        <div class="flex items-center space-x-2">
-                            <div class="w-2 h-2 bg-green-500 rounded-full pulse"></div>
-                            <span class="text-sm text-gray-300" x-text="`${viewers} online viewers`"></span>
-                        </div>
-                        <button @click="toggleDarkMode()" class="p-2 rounded-lg bg-gray-700 hover:bg-gray-600">
-                            <i class="fas fa-moon"></i>
+
+                    <!-- Navigation Links -->
+                    <div class="hidden md:flex items-center space-x-8">
+                        <a href="/" class="text-blue-300 font-medium hover:text-blue-200 transition">
+                            <i class="fas fa-home mr-2"></i>Home
+                        </a>
+                        <a href="/broadcaster.html" class="bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 rounded-lg font-medium hover:opacity-90 transition">
+                            <i class="fas fa-video mr-2"></i>Go Live
+                        </a>
+                        <a href="/viewer.html" class="bg-gray-800 px-4 py-2 rounded-lg font-medium hover:bg-gray-700 transition">
+                            <i class="fas fa-eye mr-2"></i>Watch Streams
+                        </a>
+                    </div>
+
+                    <!-- Mobile Menu Button -->
+                    <div class="md:hidden">
+                        <button @click="mobileMenuOpen = !mobileMenuOpen" class="text-gray-400 hover:text-white">
+                            <i class="fas fa-bars text-xl"></i>
                         </button>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu -->
+                <div x-show="mobileMenuOpen" x-transition class="md:hidden py-4 border-t border-gray-800">
+                    <div class="flex flex-col space-y-4">
+                        <a href="/" class="text-blue-300 font-medium">
+                            <i class="fas fa-home mr-3"></i>Home
+                        </a>
+                        <a href="/broadcaster.html" class="bg-gradient-to-r from-blue-600 to-purple-600 px-4 py-2 rounded-lg font-medium text-center">
+                            <i class="fas fa-video mr-2"></i>Go Live
+                        </a>
+                        <a href="/viewer.html" class="bg-gray-800 px-4 py-2 rounded-lg font-medium text-center">
+                            <i class="fas fa-eye mr-2"></i>Watch Streams
+                        </a>
                     </div>
                 </div>
             </div>
         </nav>
 
         <!-- Hero Section -->
-        <div class="gradient-bg">
-            <div class="max-w-7xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:px-8">
+        <div class="gradient-bg pt-20 pb-32">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16">
                 <div class="text-center">
-                    <h1 class="text-4xl font-extrabold tracking-tight text-white sm:text-5xl md:text-6xl">
-                        <span class="block">Stream YouTube Music</span>
-                        <span class="block text-blue-200">Live ke Seluruh Dunia</span>
+                    <div class="inline-block p-3 rounded-full glass-effect mb-6">
+                        <i class="fas fa-music text-3xl text-white"></i>
+                    </div>
+                    
+                    <h1 class="text-5xl md:text-6xl font-bold mb-6">
+                        <span class="block">Streaming</span>
+                        <span class="block text-blue-200">YouTube Music Live</span>
                     </h1>
-                    <p class="mt-6 max-w-lg mx-auto text-xl text-blue-100">
-                        Streaming tab Chrome dengan YouTube Music secara live. Bagikan musik favoritmu dengan mudah!
+                    
+                    <p class="text-xl text-blue-100 max-w-2xl mx-auto mb-10">
+                        Bagikan musik favorit Anda langsung dari tab Chrome. Streaming YouTube Music dengan kualitas HD dan audio jernih.
                     </p>
-                    <div class="mt-10 flex flex-col sm:flex-row justify-center gap-4">
-                        <a href="/broadcaster.html" class="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-blue-700 bg-white hover:bg-blue-50 md:py-4 md:text-lg md:px-10 transition-all">
-                            <i class="fas fa-video mr-2"></i> Mulai Streaming
+                    
+                    <div class="flex flex-col sm:flex-row justify-center gap-4">
+                        <a href="/broadcaster.html" 
+                           class="group bg-white text-blue-700 px-8 py-4 rounded-xl font-bold text-lg hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-1">
+                            <i class="fas fa-video mr-2"></i>
+                            Mulai Streaming
+                            <i class="fas fa-arrow-right ml-2 transform group-hover:translate-x-2 transition-transform"></i>
                         </a>
-                        <a href="/viewer.html" class="inline-flex items-center justify-center px-8 py-3 border border-white text-base font-medium rounded-md text-white hover:bg-blue-700 md:py-4 md:text-lg md:px-10 transition-all">
-                            <i class="fas fa-eye mr-2"></i> Tonton Stream
+                        
+                        <a href="/viewer.html" 
+                           class="group border-2 border-white text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-white/10 transition-all duration-300">
+                            <i class="fas fa-eye mr-2"></i>
+                            Jelajahi Streams
+                            <i class="fas fa-music ml-2"></i>
                         </a>
+                    </div>
+                    
+                    <!-- Stats -->
+                    <div class="mt-16 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-3xl mx-auto">
+                        <div class="glass-effect p-6 rounded-xl">
+                            <div class="text-3xl font-bold" x-text="stats.totalStreams || '0'"></div>
+                            <div class="text-gray-300">Stream Aktif</div>
+                        </div>
+                        <div class="glass-effect p-6 rounded-xl">
+                            <div class="text-3xl font-bold" x-text="stats.totalViewers || '0'"></div>
+                            <div class="text-gray-300">Penonton</div>
+                        </div>
+                        <div class="glass-effect p-6 rounded-xl">
+                            <div class="text-3xl font-bold">HD</div>
+                            <div class="text-gray-300">Kualitas</div>
+                        </div>
+                        <div class="glass-effect p-6 rounded-xl">
+                            <div class="text-3xl font-bold"><i class="fas fa-infinity"></i></div>
+                            <div class="text-gray-300">Gratis</div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
         <!-- Main Content -->
-        <main class="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-20">
             <!-- Active Streams Section -->
-            <div class="mb-12">
-                <div class="flex items-center justify-between mb-8">
-                    <h2 class="text-3xl font-bold">
-                        <i class="fas fa-fire text-red-500 mr-2"></i> Live Sekarang
-                    </h2>
-                    <button @click="refreshStreams()" class="flex items-center text-blue-400 hover:text-blue-300">
-                        <i class="fas fa-sync-alt mr-2" :class="{ 'animate-spin': isLoading }"></i>
+            <section class="mb-20">
+                <div class="flex items-center justify-between mb-10">
+                    <div>
+                        <h2 class="text-3xl font-bold mb-2">
+                            <i class="fas fa-fire text-red-500 mr-3"></i>
+                            Stream Sedang Live
+                        </h2>
+                        <p class="text-gray-400">Bergabunglah dengan streaming musik langsung sekarang</p>
+                    </div>
+                    
+                    <button @click="loadStreams()" 
+                            class="flex items-center bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-lg transition"
+                            :disabled="loading">
+                        <i class="fas fa-sync-alt mr-2" :class="{'animate-spin': loading}"></i>
                         Refresh
                     </button>
                 </div>
 
-                <div x-show="streams.length === 0" class="text-center py-12">
-                    <i class="fas fa-stream text-6xl text-gray-600 mb-4"></i>
-                    <h3 class="text-2xl font-bold text-gray-500 mb-2">Tidak Ada Stream Aktif</h3>
-                    <p class="text-gray-600 mb-6">Jadilah yang pertama memulai streaming!</p>
-                    <a href="/broadcaster.html" class="inline-flex items-center px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold transition-all">
-                        <i class="fas fa-plus mr-2"></i> Mulai Streaming Pertamamu
+                <!-- Loading State -->
+                <div x-show="loading && streams.length === 0" class="text-center py-20">
+                    <div class="loading-spinner mx-auto mb-4"></div>
+                    <p class="text-gray-400">Memuat stream...</p>
+                </div>
+
+                <!-- No Streams State -->
+                <div x-show="!loading && streams.length === 0" class="text-center py-20">
+                    <div class="music-wave mx-auto mb-6">
+                        <span></span><span></span><span></span><span></span><span></span>
+                    </div>
+                    <h3 class="text-2xl font-bold text-gray-500 mb-4">Belum Ada Stream Aktif</h3>
+                    <p class="text-gray-600 mb-8 max-w-md mx-auto">
+                        Jadilah yang pertama memulai streaming YouTube Music!
+                    </p>
+                    <a href="/broadcaster.html" 
+                       class="inline-flex items-center bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-3 rounded-xl font-bold text-lg hover:shadow-xl transition">
+                        <i class="fas fa-plus mr-2"></i>
+                        Mulai Streaming Pertama
                     </a>
                 </div>
 
+                <!-- Streams Grid -->
                 <div x-show="streams.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     <template x-for="stream in streams" :key="stream.id">
-                        <div class="stream-card bg-gray-800 rounded-xl overflow-hidden border border-gray-700">
+                        <div class="stream-card rounded-xl overflow-hidden">
                             <div class="p-6">
+                                <!-- Stream Header -->
                                 <div class="flex items-start justify-between mb-4">
                                     <div class="flex items-center">
-                                        <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                                            <i class="fas fa-user"></i>
+                                        <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                                            <i class="fas fa-user text-white"></i>
                                         </div>
-                                        <div class="ml-3">
-                                            <h3 class="font-bold" x-text="stream.username"></h3>
-                                            <div class="flex items-center text-sm text-gray-400">
+                                        <div class="ml-4">
+                                            <h3 class="font-bold text-lg" x-text="stream.username"></h3>
+                                            <div class="flex items-center text-sm text-gray-400 mt-1">
                                                 <i class="fas fa-clock mr-1"></i>
                                                 <span x-text="formatTime(stream.startedAt)"></span>
                                             </div>
                                         </div>
                                     </div>
                                     <div class="flex items-center bg-red-600 px-3 py-1 rounded-full">
-                                        <div class="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></div>
-                                        <span class="text-sm">LIVE</span>
+                                        <div class="w-2 h-2 bg-white rounded-full mr-2 live-indicator"></div>
+                                        <span class="text-sm font-semibold">LIVE</span>
                                     </div>
                                 </div>
                                 
-                                <div class="mb-4">
-                                    <div class="bg-black rounded-lg h-48 flex items-center justify-center">
-                                        <i class="fas fa-music text-4xl text-gray-600"></i>
-                                    </div>
-                                </div>
-                                
-                                <div class="flex items-center justify-between">
-                                    <div class="flex items-center space-x-4">
-                                        <div class="flex items-center">
-                                            <i class="fas fa-eye text-gray-400 mr-2"></i>
+                                <!-- Stream Preview -->
+                                <div class="mb-6 relative">
+                                    <div class="bg-black rounded-lg h-48 flex items-center justify-center relative overflow-hidden">
+                                        <!-- Music Visualization -->
+                                        <div class="absolute inset-0 opacity-20">
+                                            <div class="absolute top-1/4 left-1/4 w-32 h-32 bg-blue-500 rounded-full blur-3xl"></div>
+                                            <div class="absolute bottom-1/4 right-1/4 w-32 h-32 bg-purple-500 rounded-full blur-3xl"></div>
+                                        </div>
+                                        
+                                        <div class="relative z-10 text-center">
+                                            <i class="fas fa-music text-5xl text-gray-400 mb-4"></i>
+                                            <div class="text-gray-300 font-medium">YouTube Music</div>
+                                            <div class="text-sm text-gray-500">Live Streaming</div>
+                                        </div>
+                                        
+                                        <!-- Viewer Count Badge -->
+                                        <div class="absolute bottom-4 right-4 bg-black/70 backdrop-blur-sm px-3 py-1 rounded-full">
+                                            <i class="fas fa-users mr-2 text-blue-300"></i>
                                             <span x-text="`${stream.viewers} viewers`"></span>
                                         </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Stream Info -->
+                                <div class="space-y-3">
+                                    <div class="flex items-center justify-between">
                                         <div class="flex items-center">
-                                            <i class="fas fa-headphones text-gray-400 mr-2"></i>
-                                            <span>Music</span>
+                                            <i class="fas fa-music text-gray-400 mr-2"></i>
+                                            <span class="text-gray-300">Music Streaming</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fas fa-hd text-green-400 mr-2"></i>
+                                            <span class="text-gray-300">720p HD</span>
                                         </div>
                                     </div>
+                                    
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-headphones text-gray-400 mr-2"></i>
+                                            <span class="text-gray-300">Audio Stereo</span>
+                                        </div>
+                                        <div class="flex items-center">
+                                            <i class="fas fa-wifi text-gray-400 mr-2"></i>
+                                            <span class="text-gray-300">Stable</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Action Button -->
+                                <div class="mt-6">
                                     <a :href="`/viewer.html?stream=${stream.id}`" 
-                                       class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg font-semibold transition-all">
-                                        Watch
+                                       class="block w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-center py-3 rounded-lg font-bold transition-all hover:shadow-lg">
+                                        <i class="fas fa-play mr-2"></i>
+                                        Tonton Sekarang
                                     </a>
                                 </div>
                             </div>
                         </div>
                     </template>
                 </div>
-            </div>
+            </section>
 
             <!-- Features Section -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-                <div class="bg-gray-800 p-6 rounded-xl">
-                    <div class="text-blue-400 mb-4">
-                        <i class="fas fa-bolt text-3xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold mb-3">Setup Cepat</h3>
-                    <p class="text-gray-400">Mulai streaming dalam hitungan detik. Cukup klik dan bagikan layarmu.</p>
+            <section class="mb-20">
+                <div class="text-center mb-12">
+                    <h2 class="text-3xl font-bold mb-4">Kenapa Stream di Platform Kami?</h2>
+                    <p class="text-gray-400 max-w-2xl mx-auto">
+                        Platform streaming terbaik untuk berbagi musik langsung dari YouTube Music
+                    </p>
                 </div>
                 
-                <div class="bg-gray-800 p-6 rounded-xl">
-                    <div class="text-green-400 mb-4">
-                        <i class="fas fa-music text-3xl"></i>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Feature 1 -->
+                    <div class="glass-effect p-8 rounded-2xl">
+                        <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mb-6">
+                            <i class="fas fa-bolt text-2xl text-white"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Setup Super Cepat</h3>
+                        <p class="text-gray-400">
+                            Mulai streaming dalam 3 klik. Pilih tab Chrome dengan YouTube Music dan langsung live!
+                        </p>
                     </div>
-                    <h3 class="text-xl font-bold mb-3">YouTube Music</h3>
-                    <p class="text-gray-400">Streaming musik favoritmu langsung dari tab Chrome.</p>
-                </div>
-                
-                <div class="bg-gray-800 p-6 rounded-xl">
-                    <div class="text-purple-400 mb-4">
-                        <i class="fas fa-users text-3xl"></i>
+                    
+                    <!-- Feature 2 -->
+                    <div class="glass-effect p-8 rounded-2xl">
+                        <div class="w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mb-6">
+                            <i class="fas fa-music text-2xl text-white"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Audio Jernih</h3>
+                        <p class="text-gray-400">
+                            Streaming audio kualitas tinggi langsung dari YouTube Music. Penonton mendengar setiap nada dengan jelas.
+                        </p>
                     </div>
-                    <h3 class="text-xl font-bold mb-3">Interaktif</h3>
-                    <p class="text-gray-400">Chat langsung dengan penonton dan lihat reaksi mereka.</p>
+                    
+                    <!-- Feature 3 -->
+                    <div class="glass-effect p-8 rounded-2xl">
+                        <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mb-6">
+                            <i class="fas fa-users text-2xl text-white"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Interaktif</h3>
+                        <p class="text-gray-400">
+                            Chat live dengan penonton. Terima request lagu dan lihat reaksi langsung.
+                        </p>
+                    </div>
                 </div>
-            </div>
+            </section>
 
             <!-- How-to Section -->
-            <div class="bg-gray-800 rounded-xl p-8">
-                <h2 class="text-3xl font-bold mb-8 text-center">
-                    <i class="fas fa-graduation-cap mr-2"></i>Cara Menggunakan
+            <section class="glass-effect rounded-2xl p-8 mb-20">
+                <h2 class="text-3xl font-bold mb-10 text-center">
+                    <i class="fas fa-graduation-cap mr-3"></i>
+                    Cara Memulai Streaming
                 </h2>
+                
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <!-- Step 1 -->
                     <div class="text-center">
-                        <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 relative">
                             <span class="text-2xl font-bold">1</span>
+                            <div class="absolute -right-4 top-1/2 transform -translate-y-1/2 w-8 h-1 bg-gray-700 md:block hidden"></div>
                         </div>
-                        <h4 class="font-bold mb-2">Buka YouTube Music</h4>
-                        <p class="text-gray-400 text-sm">Buka tab Chrome baru dan kunjungi music.youtube.com</p>
+                        <h4 class="font-bold text-lg mb-2">Buka YouTube Music</h4>
+                        <p class="text-gray-400 text-sm">
+                            Buka tab Chrome baru dan kunjungi music.youtube.com
+                        </p>
                     </div>
                     
+                    <!-- Step 2 -->
                     <div class="text-center">
-                        <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 relative">
                             <span class="text-2xl font-bold">2</span>
+                            <div class="absolute -right-4 top-1/2 transform -translate-y-1/2 w-8 h-1 bg-gray-700 md:block hidden"></div>
                         </div>
-                        <h4 class="font-bold mb-2">Klik "Go Live"</h4>
-                        <p class="text-gray-400 text-sm">Buka halaman broadcaster dan klik tombol "Mulai Streaming"</p>
+                        <h4 class="font-bold text-lg mb-2">Klik "Go Live"</h4>
+                        <p class="text-gray-400 text-sm">
+                            Buka halaman broadcaster dan klik tombol "Mulai Streaming"
+                        </p>
                     </div>
                     
+                    <!-- Step 3 -->
                     <div class="text-center">
-                        <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4 relative">
                             <span class="text-2xl font-bold">3</span>
+                            <div class="absolute -right-4 top-1/2 transform -translate-y-1/2 w-8 h-1 bg-gray-700 md:block hidden"></div>
                         </div>
-                        <h4 class="font-bold mb-2">Pilih Tab</h4>
-                        <p class="text-gray-400 text-sm">Pilih tab Chrome yang berisi YouTube Music</p>
+                        <h4 class="font-bold text-lg mb-2">Pilih Tab</h4>
+                        <p class="text-gray-400 text-sm">
+                            Pilih tab Chrome yang berisi YouTube Music saat diminta browser
+                        </p>
                     </div>
                     
+                    <!-- Step 4 -->
                     <div class="text-center">
-                        <div class="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <div class="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center mx-auto mb-4">
                             <span class="text-2xl font-bold">4</span>
                         </div>
-                        <h4 class="font-bold mb-2">Bagikan Link</h4>
-                        <p class="text-gray-400 text-sm">Salin link streaming dan bagikan ke penonton</p>
+                        <h4 class="font-bold text-lg mb-2">Bagikan Link</h4>
+                        <p class="text-gray-400 text-sm">
+                            Salin link streaming dan bagikan ke teman-teman
+                        </p>
                     </div>
                 </div>
-            </div>
+                
+                <div class="text-center mt-10">
+                    <a href="/broadcaster.html" 
+                       class="inline-flex items-center bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 px-8 py-3 rounded-xl font-bold text-lg transition-all">
+                        <i class="fas fa-play-circle mr-2"></i>
+                        Mulai Streaming Sekarang
+                    </a>
+                </div>
+            </section>
         </main>
 
         <!-- Footer -->
-        <footer class="bg-gray-800 border-t border-gray-700">
-            <div class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-                <div class="flex flex-col md:flex-row justify-between items-center">
-                    <div class="mb-4 md:mb-0">
-                        <div class="flex items-center">
-                            <i class="fas fa-broadcast-tower text-2xl text-blue-400"></i>
-                            <span class="ml-2 text-xl font-bold">LiveStream</span>
+        <footer class="bg-gray-900 border-t border-gray-800">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                    <!-- Brand -->
+                    <div>
+                        <div class="flex items-center space-x-3 mb-4">
+                            <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-broadcast-tower text-white"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold">LiveStream</h3>
+                                <p class="text-sm text-gray-400">YouTube Music Streaming</p>
+                            </div>
                         </div>
-                        <p class="text-gray-400 text-sm mt-2">Stream YouTube Music dengan mudah</p>
+                        <p class="text-gray-400 text-sm">
+                            Platform streaming terbaik untuk berbagi musik langsung dari YouTube Music.
+                        </p>
                     </div>
-                    <div class="flex space-x-6">
-                        <a href="#" class="text-gray-400 hover:text-white">
-                            <i class="fab fa-github text-xl"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-white">
-                            <i class="fab fa-twitter text-xl"></i>
-                        </a>
-                        <a href="#" class="text-gray-400 hover:text-white">
-                            <i class="fab fa-discord text-xl"></i>
-                        </a>
+                    
+                    <!-- Quick Links -->
+                    <div>
+                        <h4 class="font-bold text-lg mb-4">Menu Cepat</h4>
+                        <ul class="space-y-2">
+                            <li><a href="/" class="text-gray-400 hover:text-white transition">Home</a></li>
+                            <li><a href="/broadcaster.html" class="text-gray-400 hover:text-white transition">Go Live</a></li>
+                            <li><a href="/viewer.html" class="text-gray-400 hover:text-white transition">Watch Streams</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white transition">FAQ</a></li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Resources -->
+                    <div>
+                        <h4 class="font-bold text-lg mb-4">Resources</h4>
+                        <ul class="space-y-2">
+                            <li><a href="#" class="text-gray-400 hover:text-white transition">Documentation</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white transition">API Reference</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white transition">Tutorials</a></li>
+                            <li><a href="#" class="text-gray-400 hover:text-white transition">Support</a></li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Social -->
+                    <div>
+                        <h4 class="font-bold text-lg mb-4">Connect With Us</h4>
+                        <div class="flex space-x-4">
+                            <a href="#" class="w-10 h-10 bg-gray-800 hover:bg-blue-600 rounded-full flex items-center justify-center transition">
+                                <i class="fab fa-twitter"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 bg-gray-800 hover:bg-blue-800 rounded-full flex items-center justify-center transition">
+                                <i class="fab fa-facebook-f"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 bg-gray-800 hover:bg-purple-600 rounded-full flex items-center justify-center transition">
+                                <i class="fab fa-discord"></i>
+                            </a>
+                            <a href="#" class="w-10 h-10 bg-gray-800 hover:bg-red-600 rounded-full flex items-center justify-center transition">
+                                <i class="fab fa-youtube"></i>
+                            </a>
+                        </div>
+                        
+                        <div class="mt-6">
+                            <p class="text-sm text-gray-400">Subscribe untuk update</p>
+                            <div class="mt-2 flex">
+                                <input type="email" placeholder="Email Anda" class="flex-1 bg-gray-800 border border-gray-700 rounded-l-lg px-4 py-2 focus:outline-none">
+                                <button class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-r-lg">
+                                    <i class="fas fa-paper-plane"></i>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="mt-8 pt-8 border-t border-gray-700 text-center text-gray-400 text-sm">
-                    <p>&copy; 2024 LiveStream App. Dibuat dengan <i class="fas fa-heart text-red-400"></i> untuk para pecinta musik.</p>
+                
+                <div class="mt-12 pt-8 border-t border-gray-800 text-center text-gray-400 text-sm">
+                    <p>&copy; 2024 LiveStream App. All rights reserved. Made with <i class="fas fa-heart text-red-400"></i> for music lovers.</p>
                 </div>
             </div>
         </footer>
     </div>
 
+    <script src="/socket.io/socket.io.js"></script>
     <script>
         function homeApp() {
             return {
+                mobileMenuOpen: false,
                 streams: [],
-                viewers: 0,
-                isLoading: false,
+                loading: false,
+                stats: {
+                    totalStreams: 0,
+                    totalViewers: 0
+                },
                 socket: null,
-                
-                init() {
+
+                async init() {
                     this.loadStreams();
                     this.connectWebSocket();
                     
                     // Auto-refresh every 30 seconds
                     setInterval(() => {
-                        this.loadStreams();
+                        if (!this.loading) {
+                            this.loadStreams();
+                        }
                     }, 30000);
                 },
-                
+
                 async loadStreams() {
-                    this.isLoading = true;
+                    this.loading = true;
                     try {
-                        const response = await fetch('/api/streams');
-                        const data = await response.json();
-                        this.streams = data.activeStreams || [];
-                        this.viewers = data.totalViewers || 0;
+                        // Load stats
+                        const statsResponse = await fetch('/api/stats');
+                        if (statsResponse.ok) {
+                            const statsData = await statsResponse.json();
+                            this.stats = {
+                                totalStreams: statsData.totalBroadcasters,
+                                totalViewers: statsData.totalViewers
+                            };
+                        }
+
+                        // Connect to socket for real-time updates
+                        if (!this.socket) {
+                            this.connectWebSocket();
+                        }
                     } catch (error) {
                         console.error('Error loading streams:', error);
                     }
-                    this.isLoading = false;
+                    this.loading = false;
                 },
-                
+
                 connectWebSocket() {
                     this.socket = io();
                     
-                    this.socket.on('new-stream', (stream) => {
-                        this.streams.push(stream);
+                    this.socket.on('connect', () => {
+                        console.log('Connected to WebSocket server');
+                        this.socket.emit('get-streams');
                     });
-                    
-                    this.socket.on('stream-update', (data) => {
-                        if (data.type === 'stopped') {
-                            this.streams = this.streams.filter(s => s.id !== data.streamId);
-                        }
-                        this.loadStreams(); // Refresh list
+
+                    this.socket.on('active-streams', (streams) => {
+                        this.streams = streams;
+                        this.stats.totalStreams = streams.length;
+                        this.stats.totalViewers = streams.reduce((sum, stream) => sum + stream.viewers, 0);
                     });
-                    
-                    this.socket.on('viewer-count-update', () => {
-                        this.loadStreams();
+
+                    this.socket.on('stream-list-updated', (streams) => {
+                        this.streams = streams;
+                        this.stats.totalStreams = streams.length;
+                        this.stats.totalViewers = streams.reduce((sum, stream) => sum + stream.viewers, 0);
+                    });
+
+                    this.socket.on('disconnect', () => {
+                        console.log('Disconnected from WebSocket server');
                     });
                 },
-                
-                refreshStreams() {
-                    this.loadStreams();
-                },
-                
+
                 formatTime(timestamp) {
                     const now = new Date();
                     const streamTime = new Date(timestamp);
@@ -322,11 +599,8 @@
                     
                     if (diff < 60) return `${diff} detik lalu`;
                     if (diff < 3600) return `${Math.floor(diff / 60)} menit lalu`;
-                    return `${Math.floor(diff / 3600)} jam lalu`;
-                },
-                
-                toggleDarkMode() {
-                    document.documentElement.classList.toggle('dark');
+                    if (diff < 86400) return `${Math.floor(diff / 3600)} jam lalu`;
+                    return `${Math.floor(diff / 86400)} hari lalu`;
                 }
             }
         }
