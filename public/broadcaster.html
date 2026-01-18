@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="id">
+<html lang="id" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,16 +7,16 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-    <script src="/socket.io/socket.io.js"></script>
     <style>
-        .pulse {
-            animation: pulse 2s infinite;
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        * { font-family: 'Poppins', sans-serif; }
+        
+        .glass-effect {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
+        
         .gradient-border {
             border: 2px solid transparent;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) border-box;
@@ -24,78 +24,188 @@
             -webkit-mask-composite: xor;
             mask-composite: exclude;
         }
+        
+        .live-indicator {
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .audio-visualizer {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 30px;
+        }
+        
+        .audio-visualizer span {
+            display: block;
+            width: 4px;
+            height: 20px;
+            background: #4f46e5;
+            margin: 0 2px;
+            border-radius: 2px;
+            animation: audioWave 1.2s infinite ease-in-out;
+            transform-origin: bottom;
+        }
+        
+        .audio-visualizer span:nth-child(2) { animation-delay: -1.1s; }
+        .audio-visualizer span:nth-child(3) { animation-delay: -1.0s; }
+        .audio-visualizer span:nth-child(4) { animation-delay: -0.9s; }
+        .audio-visualizer span:nth-child(5) { animation-delay: -0.8s; }
+        
+        @keyframes audioWave {
+            0%, 40%, 100% { transform: scaleY(0.3); }
+            20% { transform: scaleY(1); }
+        }
+        
+        .video-preview {
+            background: linear-gradient(45deg, #1a1a2e, #16213e);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .video-preview::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(79, 70, 229, 0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+        
+        @keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .chat-message-enter {
+            animation: slideIn 0.3s ease-out;
+        }
+        
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .toast-enter {
+            animation: toastIn 0.3s ease-out;
+        }
+        
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
     </style>
 </head>
-<body class="bg-gray-900 text-white">
-    <div x-data="broadcasterApp()" x-init="init()" class="min-h-screen">
+<body class="bg-gray-900 text-white min-h-screen">
+    <div x-data="broadcasterApp()" x-init="init()">
         <!-- Navigation -->
-        <nav class="bg-gray-800 border-b border-gray-700">
+        <nav class="glass-effect border-b border-gray-800">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16">
                     <div class="flex items-center">
-                        <a href="/" class="flex items-center">
-                            <i class="fas fa-arrow-left text-gray-400 hover:text-white mr-4"></i>
-                            <i class="fas fa-broadcast-tower text-xl text-blue-400"></i>
-                            <span class="ml-2 text-lg font-bold">LiveStream Broadcaster</span>
+                        <a href="/" class="flex items-center hover:opacity-80 transition">
+                            <i class="fas fa-arrow-left text-gray-400 mr-4"></i>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-video text-white"></i>
+                                </div>
+                                <div>
+                                    <h1 class="text-lg font-bold">LiveStream Broadcaster</h1>
+                                    <p class="text-xs text-gray-400">YouTube Music Streaming</p>
+                                </div>
+                            </div>
                         </a>
                     </div>
+                    
                     <div class="flex items-center space-x-4">
                         <div class="hidden md:flex items-center space-x-2">
-                            <div class="w-2 h-2 rounded-full" :class="isStreaming ? 'bg-green-500 pulse' : 'bg-red-500'"></div>
-                            <span x-text="isStreaming ? 'LIVE' : 'OFFLINE'"></span>
+                            <div class="w-3 h-3 rounded-full" 
+                                 :class="isStreaming ? 'bg-green-500 live-indicator' : 'bg-red-500'"></div>
+                            <span class="font-medium" x-text="isStreaming ? 'LIVE' : 'OFFLINE'"></span>
                         </div>
-                        <div class="flex items-center bg-gray-700 px-3 py-1 rounded-full">
-                            <i class="fas fa-users mr-2"></i>
+                        
+                        <div class="flex items-center bg-gray-800 px-3 py-1 rounded-lg">
+                            <i class="fas fa-users mr-2 text-blue-300"></i>
                             <span x-text="viewerCount"></span>
                         </div>
+                        
+                        <button @click="toggleSettings()" class="p-2 hover:bg-gray-800 rounded-lg transition">
+                            <i class="fas fa-cog"></i>
+                        </button>
                     </div>
                 </div>
             </div>
         </nav>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <!-- Alert Section -->
-            <div x-show="showAlert" 
-                 x-transition:enter="transition ease-out duration-300"
-                 x-transition:enter-start="opacity-0 translate-y-2"
-                 x-transition:enter-end="opacity-100 translate-y-0"
-                 class="mb-6 p-4 rounded-lg" 
-                 :class="alertType === 'error' ? 'bg-red-900 border border-red-700' : 'bg-green-900 border border-green-700'">
+        <!-- Alert Notification -->
+        <div x-show="showAlert" 
+             x-transition:enter="transition ease-out duration-300"
+             x-transition:enter-start="opacity-0 -translate-y-2"
+             x-transition:enter-end="opacity-100 translate-y-0"
+             class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
+            <div class="glass-effect rounded-lg p-4" 
+                 :class="alertType === 'error' ? 'border-red-500/30' : 'border-green-500/30'">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center">
-                        <i class="fas mr-3" :class="alertType === 'error' ? 'fa-exclamation-circle' : 'fa-check-circle'"></i>
+                        <i class="fas mr-3 text-lg" 
+                           :class="alertType === 'error' ? 'fa-exclamation-circle text-red-400' : 
+                                   alertType === 'success' ? 'fa-check-circle text-green-400' : 
+                                   'fa-info-circle text-blue-400'"></i>
                         <span x-text="alertMessage"></span>
                     </div>
-                    <button @click="showAlert = false" class="text-gray-300 hover:text-white">
+                    <button @click="showAlert = false" class="text-gray-400 hover:text-white">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
             </div>
+        </div>
 
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 <!-- Left Panel - Controls -->
                 <div class="lg:col-span-1 space-y-6">
                     <!-- Stream Info Card -->
-                    <div class="bg-gray-800 rounded-xl p-6">
+                    <div class="glass-effect rounded-xl p-6">
                         <h2 class="text-xl font-bold mb-4 text-blue-300">
-                            <i class="fas fa-info-circle mr-2"></i>Info Streaming
+                            <i class="fas fa-info-circle mr-2"></i>Stream Information
                         </h2>
                         
                         <div class="space-y-4">
                             <div>
-                                <label class="block text-sm font-medium text-gray-400 mb-2">Nama Stream</label>
-                                <input x-model="streamName" 
+                                <label class="block text-sm font-medium text-gray-400 mb-2">Stream Title</label>
+                                <input x-model="streamTitle" 
                                        type="text" 
-                                       class="w-full bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                       placeholder="Masukkan nama stream Anda">
+                                       class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                       placeholder="My YouTube Music Stream"
+                                       :disabled="isStreaming">
                             </div>
                             
                             <div>
                                 <label class="block text-sm font-medium text-gray-400 mb-2">Stream ID</label>
-                                <div class="flex items-center bg-gray-700 px-4 py-2 rounded-lg">
-                                    <code class="text-sm text-gray-300 flex-1" x-text="streamId"></code>
-                                    <button @click="copyToClipboard(streamId)" 
-                                            class="ml-2 text-blue-400 hover:text-blue-300">
+                                <div class="flex items-center bg-gray-800 border border-gray-700 rounded-lg px-4 py-3">
+                                    <code class="text-sm font-mono text-gray-300 flex-1 truncate" 
+                                          x-text="streamId"></code>
+                                    <button @click="copyToClipboard(streamId, 'Stream ID')" 
+                                            class="ml-2 text-blue-400 hover:text-blue-300 p-1">
                                         <i class="fas fa-copy"></i>
                                     </button>
                                 </div>
@@ -103,10 +213,11 @@
                             
                             <div>
                                 <label class="block text-sm font-medium text-gray-400 mb-2">Stream URL</label>
-                                <div class="flex items-center bg-gray-700 px-4 py-2 rounded-lg">
-                                    <code class="text-sm text-gray-300 flex-1 truncate" x-text="streamUrl"></code>
-                                    <button @click="copyToClipboard(streamUrl)" 
-                                            class="ml-2 text-blue-400 hover:text-blue-300">
+                                <div class="flex items-center bg-gray-800 border border-gray-700 rounded-lg px-4 py-3">
+                                    <code class="text-sm font-mono text-gray-300 flex-1 truncate" 
+                                          x-text="streamUrl"></code>
+                                    <button @click="copyToClipboard(streamUrl, 'Stream URL')" 
+                                            class="ml-2 text-blue-400 hover:text-blue-300 p-1">
                                         <i class="fas fa-copy"></i>
                                     </button>
                                 </div>
@@ -115,103 +226,135 @@
                     </div>
 
                     <!-- Streaming Controls -->
-                    <div class="bg-gray-800 rounded-xl p-6">
+                    <div class="glass-effect rounded-xl p-6">
                         <h2 class="text-xl font-bold mb-6 text-blue-300">
-                            <i class="fas fa-sliders-h mr-2"></i>Kontrol Streaming
+                            <i class="fas fa-sliders-h mr-2"></i>Stream Controls
                         </h2>
                         
                         <div class="space-y-4">
+                            <!-- Start/Stop Stream Button -->
                             <button @click="toggleStream()" 
-                                    class="w-full py-3 px-4 rounded-lg font-semibold flex items-center justify-center transition-all"
+                                    class="w-full py-4 px-6 rounded-xl font-bold text-lg flex items-center justify-center transition-all duration-300 transform hover:scale-[1.02]"
                                     :class="isStreaming ? 
-                                            'bg-red-600 hover:bg-red-700' : 
-                                            'bg-blue-600 hover:bg-blue-700'">
-                                <i class="fas mr-2" :class="isStreaming ? 'fa-stop' : 'fa-play'"></i>
-                                <span x-text="isStreaming ? 'Stop Streaming' : 'Mulai Streaming'"></span>
+                                            'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800' : 
+                                            'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700'">
+                                <i class="fas mr-3 text-xl" :class="isStreaming ? 'fa-stop' : 'fa-play'"></i>
+                                <span x-text="isStreaming ? 'STOP STREAMING' : 'START STREAMING'"></span>
                             </button>
                             
+                            <!-- Control Buttons -->
                             <div class="grid grid-cols-2 gap-3">
                                 <button @click="toggleAudio()" 
-                                        class="py-3 px-4 bg-gray-700 hover:bg-gray-600 rounded-lg font-semibold flex items-center justify-center transition-all">
+                                        class="py-3 px-4 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium flex items-center justify-center transition"
+                                        :disabled="!isStreaming">
                                     <i class="fas mr-2" :class="isAudioEnabled ? 'fa-volume-up' : 'fa-volume-mute'"></i>
-                                    <span x-text="isAudioEnabled ? 'Mute' : 'Unmute'"></span>
+                                    <span x-text="isAudioEnabled ? 'Mute Audio' : 'Unmute Audio'"></span>
                                 </button>
                                 
                                 <button @click="toggleVideo()" 
-                                        class="py-3 px-4 bg-gray-700 hover:bg-gray-600 rounded-lg font-semibold flex items-center justify-center transition-all">
+                                        class="py-3 px-4 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium flex items-center justify-center transition"
+                                        :disabled="!isStreaming">
                                     <i class="fas mr-2" :class="isVideoEnabled ? 'fa-video' : 'fa-video-slash'"></i>
-                                    <span x-text="isVideoEnabled ? 'Video Off' : 'Video On'"></span>
+                                    <span x-text="isVideoEnabled ? 'Hide Video' : 'Show Video'"></span>
                                 </button>
                             </div>
                             
+                            <!-- Share Button -->
                             <button @click="shareStream()" 
-                                    class="w-full py-3 px-4 bg-green-600 hover:bg-green-700 rounded-lg font-semibold flex items-center justify-center transition-all">
+                                    class="w-full py-3 px-4 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 rounded-lg font-bold flex items-center justify-center transition">
                                 <i class="fas fa-share-alt mr-2"></i>
-                                Bagikan Stream
+                                SHARE STREAM
                             </button>
                         </div>
                     </div>
 
-                    <!-- Stream Stats -->
-                    <div class="bg-gray-800 rounded-xl p-6">
+                    <!-- Stream Statistics -->
+                    <div class="glass-effect rounded-xl p-6">
                         <h2 class="text-xl font-bold mb-6 text-blue-300">
-                            <i class="fas fa-chart-bar mr-2"></i>Statistik
+                            <i class="fas fa-chart-bar mr-2"></i>Stream Statistics
                         </h2>
                         
                         <div class="space-y-4">
                             <div class="flex justify-between items-center">
-                                <span class="text-gray-400">Penonton:</span>
-                                <span class="font-bold" x-text="viewerCount"></span>
+                                <div class="flex items-center">
+                                    <i class="fas fa-users text-gray-400 mr-2"></i>
+                                    <span class="text-gray-400">Viewers:</span>
+                                </div>
+                                <span class="font-bold text-lg" x-text="viewerCount"></span>
                             </div>
+                            
                             <div class="flex justify-between items-center">
-                                <span class="text-gray-400">Durasi:</span>
-                                <span class="font-bold" x-text="streamDuration"></span>
+                                <div class="flex items-center">
+                                    <i class="fas fa-clock text-gray-400 mr-2"></i>
+                                    <span class="text-gray-400">Duration:</span>
+                                </div>
+                                <span class="font-bold text-lg" x-text="streamDuration"></span>
                             </div>
+                            
                             <div class="flex justify-between items-center">
-                                <span class="text-gray-400">Bitrate:</span>
+                                <div class="flex items-center">
+                                    <i class="fas fa-signal text-gray-400 mr-2"></i>
+                                    <span class="text-gray-400">Bitrate:</span>
+                                </div>
                                 <span class="font-bold" x-text="bitrate"></span>
                             </div>
+                            
                             <div class="flex justify-between items-center">
-                                <span class="text-gray-400">Resolusi:</span>
+                                <div class="flex items-center">
+                                    <i class="fas fa-hd text-gray-400 mr-2"></i>
+                                    <span class="text-gray-400">Resolution:</span>
+                                </div>
                                 <span class="font-bold">1280x720</span>
+                            </div>
+                            
+                            <div class="flex justify-between items-center">
+                                <div class="flex items-center">
+                                    <i class="fas fa-broadcast-tower text-gray-400 mr-2"></i>
+                                    <span class="text-gray-400">Status:</span>
+                                </div>
+                                <span class="font-bold" :class="isStreaming ? 'text-green-400' : 'text-red-400'"
+                                      x-text="isStreaming ? 'LIVE' : 'OFFLINE'"></span>
                             </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Middle Panel - Video Preview -->
+                <!-- Right Panel - Video & Chat -->
                 <div class="lg:col-span-2">
-                    <!-- Video Preview -->
-                    <div class="bg-black rounded-xl overflow-hidden mb-6">
-                        <div class="relative">
+                    <!-- Video Preview Section -->
+                    <div class="mb-6">
+                        <div class="video-preview rounded-2xl overflow-hidden border-2 border-gray-800">
+                            <!-- Local Video Preview -->
                             <video id="localVideo" 
                                    autoplay 
                                    muted 
                                    playsinline 
-                                   class="w-full h-auto max-h-[600px] bg-gray-900"
-                                   x-show="isStreaming"></video>
+                                   class="w-full h-auto max-h-[600px] bg-black"
+                                   x-show="isStreaming && isVideoEnabled"></video>
                             
                             <!-- Preview when not streaming -->
-                            <div x-show="!isStreaming" 
-                                 class="w-full h-[600px] flex flex-col items-center justify-center bg-gradient-to-br from-gray-800 to-gray-900 p-6">
+                            <div x-show="!isStreaming || !isVideoEnabled" 
+                                 class="w-full min-h-[600px] flex flex-col items-center justify-center p-8">
                                 <div class="text-center mb-8">
-                                    <div class="w-24 h-24 gradient-border rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <i class="fas fa-video text-4xl text-blue-400"></i>
+                                    <div class="w-32 h-32 gradient-border rounded-full flex items-center justify-center mx-auto mb-6">
+                                        <i class="fas fa-video text-5xl text-blue-400"></i>
                                     </div>
                                     <h3 class="text-2xl font-bold mb-2">Stream Preview</h3>
-                                    <p class="text-gray-400">Preview akan muncul di sini saat streaming dimulai</p>
+                                    <p class="text-gray-400 max-w-md mx-auto">
+                                        Your stream will appear here when you start broadcasting
+                                    </p>
                                 </div>
                                 
-                                <div class="grid grid-cols-3 gap-4 max-w-md">
-                                    <div class="text-center p-4 bg-gray-800 rounded-lg">
+                                <div class="grid grid-cols-3 gap-4 max-w-lg">
+                                    <div class="text-center p-4 bg-gray-800/50 rounded-xl">
                                         <i class="fas fa-music text-blue-400 text-2xl mb-2"></i>
                                         <p class="text-sm text-gray-400">YouTube Music</p>
                                     </div>
-                                    <div class="text-center p-4 bg-gray-800 rounded-lg">
-                                        <i class="fas fa-chrome text-green-400 text-2xl mb-2"></i>
+                                    <div class="text-center p-4 bg-gray-800/50 rounded-xl">
+                                        <i class="fab fa-chrome text-green-400 text-2xl mb-2"></i>
                                         <p class="text-sm text-gray-400">Chrome Tab</p>
                                     </div>
-                                    <div class="text-center p-4 bg-gray-800 rounded-lg">
+                                    <div class="text-center p-4 bg-gray-800/50 rounded-xl">
                                         <i class="fas fa-hd text-purple-400 text-2xl mb-2"></i>
                                         <p class="text-sm text-gray-400">720p HD</p>
                                     </div>
@@ -220,33 +363,36 @@
 
                             <!-- Streaming Overlay -->
                             <div x-show="isStreaming" 
-                                 class="absolute top-4 left-4 flex items-center space-x-2">
-                                <div class="flex items-center bg-red-600 px-3 py-1 rounded-full">
-                                    <div class="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></div>
-                                    <span class="text-sm font-semibold">LIVE</span>
+                                 class="absolute top-6 left-6 flex items-center space-x-3">
+                                <div class="flex items-center bg-red-600 px-4 py-2 rounded-full shadow-lg">
+                                    <div class="w-3 h-3 bg-white rounded-full mr-2 live-indicator"></div>
+                                    <span class="font-bold">LIVE</span>
                                 </div>
-                                <div class="bg-black/70 backdrop-blur-sm px-3 py-1 rounded-full">
-                                    <span class="text-sm" x-text="streamDuration"></span>
+                                
+                                <div class="bg-black/70 backdrop-blur-sm px-4 py-2 rounded-full">
+                                    <span class="font-medium" x-text="streamDuration"></span>
                                 </div>
                             </div>
 
-                            <!-- Viewers Overlay -->
+                            <!-- Viewer Count Overlay -->
                             <div x-show="isStreaming" 
-                                 class="absolute top-4 right-4 bg-black/70 backdrop-blur-sm px-3 py-1 rounded-full">
-                                <i class="fas fa-users mr-2"></i>
-                                <span x-text="viewerCount"></span>
+                                 class="absolute top-6 right-6 bg-black/70 backdrop-blur-sm px-4 py-2 rounded-full">
+                                <i class="fas fa-users mr-2 text-blue-300"></i>
+                                <span class="font-medium" x-text="viewerCount + ' viewers'"></span>
                             </div>
 
-                            <!-- Audio Level Indicator -->
+                            <!-- Audio Indicator -->
                             <div x-show="isStreaming && isAudioEnabled" 
-                                 class="absolute bottom-4 left-4 right-4">
-                                <div class="bg-black/70 backdrop-blur-sm rounded-full p-2">
-                                    <div class="flex items-center justify-center space-x-1">
-                                        <template x-for="i in 10" :key="i">
-                                            <div class="w-1 bg-blue-500 rounded-full" 
-                                                 :class="{'h-2': i % 2 === 0, 'h-4': i % 2 === 1}"
-                                                 :style="`animation: audioPulse ${Math.random() * 0.5 + 0.5}s infinite alternate;`"></div>
-                                        </template>
+                                 class="absolute bottom-6 left-6 right-6">
+                                <div class="bg-black/70 backdrop-blur-sm rounded-full p-3">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center">
+                                            <i class="fas fa-volume-up text-green-400 mr-3"></i>
+                                            <span class="text-sm">Audio Active</span>
+                                        </div>
+                                        <div class="audio-visualizer">
+                                            <span></span><span></span><span></span><span></span><span></span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -254,88 +400,116 @@
                     </div>
 
                     <!-- Instructions -->
-                    <div class="bg-gray-800 rounded-xl p-6 mb-6">
+                    <div class="glass-effect rounded-xl p-6 mb-6">
                         <h2 class="text-xl font-bold mb-4 text-blue-300">
-                            <i class="fas fa-graduation-cap mr-2"></i>Panduan Streaming
+                            <i class="fas fa-graduation-cap mr-2"></i>How to Stream YouTube Music
                         </h2>
                         
                         <div class="space-y-4">
                             <div class="flex items-start">
-                                <div class="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-3">
+                                <div class="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-3 mt-1">
                                     <span class="font-bold">1</span>
                                 </div>
                                 <div>
-                                    <h4 class="font-bold mb-1">Buka YouTube Music</h4>
-                                    <p class="text-gray-400 text-sm">Buka tab Chrome baru dan kunjungi <a href="https://music.youtube.com" target="_blank" class="text-blue-400 hover:underline">music.youtube.com</a></p>
+                                    <h4 class="font-bold mb-1">Open YouTube Music</h4>
+                                    <p class="text-gray-400 text-sm">
+                                        Open Chrome and go to <a href="https://music.youtube.com" target="_blank" 
+                                           class="text-blue-400 hover:text-blue-300 underline">music.youtube.com</a>
+                                    </p>
                                 </div>
                             </div>
                             
                             <div class="flex items-start">
-                                <div class="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-3">
+                                <div class="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-3 mt-1">
                                     <span class="font-bold">2</span>
                                 </div>
                                 <div>
-                                    <h4 class="font-bold mb-1">Pilih Tab yang Tepat</h4>
-                                    <p class="text-gray-400 text-sm">Saat diminta oleh browser, pilih tab Chrome yang berisi YouTube Music</p>
+                                    <h4 class="font-bold mb-1">Start Streaming</h4>
+                                    <p class="text-gray-400 text-sm">
+                                        Click "START STREAMING" button above. When prompted, select the Chrome tab with YouTube Music.
+                                    </p>
                                 </div>
                             </div>
                             
                             <div class="flex items-start">
-                                <div class="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-3">
+                                <div class="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-3 mt-1">
                                     <span class="font-bold">3</span>
                                 </div>
                                 <div>
-                                    <h4 class="font-bold mb-1">Bagikan Stream URL</h4>
-                                    <p class="text-gray-400 text-sm">Salin URL di atas dan bagikan ke teman-teman untuk menonton</p>
+                                    <h4 class="font-bold mb-1">Share the Stream</h4>
+                                    <p class="text-gray-400 text-sm">
+                                        Copy the Stream URL above and share it with your viewers so they can watch.
+                                    </p>
                                 </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Chat Section -->
-                    <div class="bg-gray-800 rounded-xl p-6">
-                        <h2 class="text-xl font-bold mb-4 text-blue-300">
-                            <i class="fas fa-comments mr-2"></i>Chat Stream
-                        </h2>
-                        
-                        <div class="space-y-4">
-                            <!-- Chat Messages -->
-                            <div class="h-64 overflow-y-auto bg-gray-900 rounded-lg p-4 space-y-3">
-                                <template x-for="message in chatMessages" :key="message.id">
-                                    <div class="flex items-start" :class="message.type === 'system' ? 'justify-center' : ''">
-                                        <template x-if="message.type === 'message'">
-                                            <div class="bg-gray-700 rounded-lg p-3 max-w-xs">
-                                                <div class="flex items-center mb-1">
-                                                    <span class="font-bold text-blue-300" x-text="message.username"></span>
-                                                    <span class="text-gray-400 text-xs ml-2" x-text="formatTime(message.timestamp)"></span>
-                                                </div>
-                                                <p x-text="message.message"></p>
-                                            </div>
-                                        </template>
-                                        <template x-if="message.type === 'system'">
-                                            <div class="bg-gray-900 border border-gray-700 rounded-lg px-3 py-2">
-                                                <p class="text-sm text-gray-400 text-center">
-                                                    <i class="fas fa-info-circle mr-2"></i>
-                                                    <span x-text="message.message"></span>
-                                                </p>
-                                            </div>
-                                        </template>
-                                    </div>
-                                </template>
-                            </div>
-                            
-                            <!-- Chat Input -->
-                            <div class="flex space-x-2">
-                                <input x-model="newMessage" 
-                                       @keyup.enter="sendChatMessage()"
-                                       type="text" 
-                                       placeholder="Ketik pesan..."
-                                       class="flex-1 bg-gray-700 border border-gray-600 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
-                                <button @click="sendChatMessage()" 
-                                        class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded-lg font-semibold transition-all">
-                                    <i class="fas fa-paper-plane"></i>
+                    <div class="glass-effect rounded-xl p-6">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-xl font-bold text-blue-300">
+                                <i class="fas fa-comments mr-2"></i>Live Chat
+                            </h2>
+                            <div class="flex items-center space-x-2">
+                                <span class="text-sm text-gray-400" x-text="chatMessages.length + ' messages'"></span>
+                                <button @click="clearChat()" class="text-sm text-gray-400 hover:text-white">
+                                    <i class="fas fa-trash-alt"></i>
                                 </button>
                             </div>
+                        </div>
+                        
+                        <!-- Chat Messages -->
+                        <div class="h-80 overflow-y-auto mb-4 p-2 space-y-3">
+                            <template x-for="message in chatMessages" :key="message.id">
+                                <div class="chat-message-enter" 
+                                     :class="message.type === 'system' ? 'justify-center' : ''">
+                                    
+                                    <!-- System Message -->
+                                    <template x-if="message.type === 'system'">
+                                        <div class="text-center my-2">
+                                            <div class="inline-block bg-gray-800/50 text-gray-400 text-sm px-4 py-2 rounded-lg">
+                                                <i class="fas" :class="getMessageIcon(message.message)"></i>
+                                                <span class="ml-2" x-text="message.message"></span>
+                                            </div>
+                                        </div>
+                                    </template>
+                                    
+                                    <!-- User Message -->
+                                    <template x-if="message.type === 'message'">
+                                        <div class="flex items-start space-x-3">
+                                            <div class="flex-shrink-0">
+                                                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-xs font-bold">
+                                                    <span x-text="message.username.charAt(0).toUpperCase()"></span>
+                                                </div>
+                                            </div>
+                                            <div class="flex-1">
+                                                <div class="flex items-baseline">
+                                                    <span class="font-bold" x-text="message.username"></span>
+                                                    <span class="text-xs text-gray-400 ml-2" 
+                                                          x-text="formatTime(message.timestamp)"></span>
+                                                </div>
+                                                <p class="mt-1 text-gray-300" x-text="message.message"></p>
+                                            </div>
+                                        </div>
+                                    </template>
+                                </div>
+                            </template>
+                        </div>
+                        
+                        <!-- Chat Input -->
+                        <div class="flex space-x-2">
+                            <input x-model="newMessage" 
+                                   @keyup.enter="sendChatMessage()"
+                                   type="text" 
+                                   placeholder="Type your message..."
+                                   class="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                   :disabled="!isStreaming">
+                            <button @click="sendChatMessage()" 
+                                    class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 px-6 py-3 rounded-lg font-bold transition"
+                                    :disabled="!isStreaming || !newMessage.trim()">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -345,26 +519,33 @@
         <!-- Toast Notification -->
         <div x-show="showToast" 
              x-transition:enter="transition ease-out duration-300"
-             x-transition:enter-start="opacity-0 translate-y-2"
-             x-transition:enter-end="opacity-100 translate-y-0"
+             x-transition:enter-start="opacity-0 translate-x-full"
+             x-transition:enter-end="opacity-100 translate-x-0"
              x-transition:leave="transition ease-in duration-300"
-             x-transition:leave-start="opacity-100 translate-y-0"
-             x-transition:leave-end="opacity-0 translate-y-2"
-             class="fixed bottom-4 right-4 bg-green-600 text-white px-6 py-3 rounded-lg shadow-lg max-w-sm">
-            <div class="flex items-center">
-                <i class="fas fa-check-circle mr-2"></i>
-                <span x-text="toastMessage"></span>
+             x-transition:leave-start="opacity-100 translate-x-0"
+             x-transition:leave-end="opacity-0 translate-x-full"
+             class="fixed bottom-6 right-6 max-w-sm">
+            <div class="glass-effect rounded-xl p-4 shadow-2xl">
+                <div class="flex items-center">
+                    <i class="fas mr-3 text-xl" :class="toastIcon"></i>
+                    <div>
+                        <div class="font-bold" x-text="toastTitle"></div>
+                        <div class="text-sm text-gray-300" x-text="toastMessage"></div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
+    <script src="/socket.io/socket.io.js"></script>
     <script>
         function broadcasterApp() {
             return {
+                // State
                 isStreaming: false,
                 isAudioEnabled: true,
                 isVideoEnabled: true,
-                streamName: 'YouTube Music Stream',
+                streamTitle: 'My YouTube Music Stream',
                 streamId: '',
                 streamUrl: '',
                 viewerCount: 0,
@@ -376,65 +557,92 @@
                 alertMessage: '',
                 alertType: 'info',
                 showToast: false,
+                toastTitle: '',
                 toastMessage: '',
+                toastIcon: 'fa-info-circle',
+                settingsOpen: false,
+                
+                // WebRTC
                 localStream: null,
                 socket: null,
+                peerConnections: {},
                 streamStartTime: null,
                 durationInterval: null,
+                bitrateInterval: null,
 
                 async init() {
-                    // Generate stream ID
+                    // Generate unique stream ID
                     this.streamId = 'stream_' + Math.random().toString(36).substr(2, 9);
                     this.streamUrl = `${window.location.origin}/viewer.html?stream=${this.streamId}`;
                     
-                    // Connect to WebSocket
+                    // Initialize chat with welcome message
+                    this.addSystemMessage('Welcome to your stream! Start streaming to chat with viewers.');
+                    
+                    // Connect to WebSocket server
                     this.connectWebSocket();
                     
-                    // Initialize system message
-                    this.chatMessages.push({
-                        id: Date.now(),
-                        type: 'system',
-                        message: 'Selamat datang di LiveStream! Mulai streaming untuk berinteraksi dengan penonton.',
-                        timestamp: new Date().toISOString()
-                    });
+                    // Load saved settings
+                    this.loadSettings();
                 },
 
                 connectWebSocket() {
                     this.socket = io();
                     
                     this.socket.on('connect', () => {
-                        this.socket.emit('set-user-type', {
-                            type: 'broadcaster',
-                            username: 'Broadcaster_' + this.streamId.substring(0, 6)
-                        });
-                        
-                        this.showAlertMessage('Terhubung ke server streaming', 'success');
+                        console.log('✅ Connected to signaling server');
+                        this.showToastMessage('Connected', 'Connected to streaming server', 'fa-link');
                     });
 
-                    this.socket.on('viewer-count-update', (data) => {
-                        if (data.streamId === this.streamId) {
-                            this.viewerCount = data.viewers;
-                            
-                            // Add system message when viewer joins/leaves
-                            if (data.viewers > this.viewerCount) {
-                                this.addSystemMessage('Penonton baru bergabung!');
-                            }
+                    // WebRTC Signaling
+                    this.socket.on('viewer-request', (data) => {
+                        console.log('👁️ Viewer requested to watch:', data.viewerId);
+                        this.addSystemMessage(`${data.viewerName} wants to watch your stream`);
+                        this.createPeerConnection(data.viewerId);
+                    });
+
+                    this.socket.on('webrtc-answer', (data) => {
+                        console.log('📥 Received answer from:', data.sender);
+                        if (this.peerConnections[data.sender]) {
+                            this.peerConnections[data.sender].setRemoteDescription(new RTCSessionDescription(data.sdp))
+                                .then(() => {
+                                    console.log('✅ Remote description set for:', data.sender);
+                                })
+                                .catch(error => {
+                                    console.error('❌ Error setting remote description:', error);
+                                });
                         }
                     });
 
-                    this.socket.on('chat-message', (message) => {
-                        this.chatMessages.push(message);
-                        // Auto-scroll to bottom
-                        setTimeout(() => {
-                            const chatContainer = document.querySelector('.overflow-y-auto');
-                            if (chatContainer) {
-                                chatContainer.scrollTop = chatContainer.scrollHeight;
-                            }
-                        }, 100);
+                    this.socket.on('ice-candidate', (data) => {
+                        console.log('🧊 Received ICE candidate from:', data.sender);
+                        if (this.peerConnections[data.sender]) {
+                            this.peerConnections[data.sender].addIceCandidate(new RTCIceCandidate(data.candidate))
+                                .catch(error => {
+                                    console.error('❌ Error adding ICE candidate:', error);
+                                });
+                        }
                     });
 
+                    // Viewer count updates
+                    this.socket.on('viewer-count-update', (data) => {
+                        this.viewerCount = data.count;
+                    });
+
+                    // Chat messages
+                    this.socket.on('chat-message', (message) => {
+                        this.chatMessages.push(message);
+                        this.scrollChatToBottom();
+                    });
+
+                    // Disconnection handling
                     this.socket.on('disconnect', () => {
-                        this.showAlertMessage('Terputus dari server. Silakan refresh halaman.', 'error');
+                        console.log('❌ Disconnected from signaling server');
+                        this.showAlertMessage('Disconnected from server. Please refresh the page.', 'error');
+                    });
+
+                    this.socket.on('error', (error) => {
+                        console.error('❌ Socket error:', error);
+                        this.showAlertMessage(`Connection error: ${error.message}`, 'error');
                     });
                 },
 
@@ -448,6 +656,8 @@
 
                 async startStream() {
                     try {
+                        console.log('🎬 Starting stream...');
+                        
                         // Request screen capture with audio
                         const constraints = {
                             video: {
@@ -459,75 +669,227 @@
                             audio: this.isAudioEnabled ? {
                                 echoCancellation: true,
                                 noiseSuppression: true,
-                                sampleRate: 44100
+                                autoGainControl: true,
+                                sampleRate: 44100,
+                                channelCount: 2
                             } : false
                         };
 
+                        // Request screen capture
                         this.localStream = await navigator.mediaDevices.getDisplayMedia(constraints);
                         
-                        // Get video element
+                        // Check if audio was captured
+                        const audioTracks = this.localStream.getAudioTracks();
+                        if (audioTracks.length === 0 && this.isAudioEnabled) {
+                            console.log('🔇 No audio captured, trying to get audio separately...');
+                            try {
+                                const audioStream = await navigator.mediaDevices.getUserMedia({ 
+                                    audio: {
+                                        echoCancellation: true,
+                                        noiseSuppression: true,
+                                        autoGainControl: true,
+                                        sampleRate: 44100
+                                    } 
+                                });
+                                audioStream.getAudioTracks().forEach(track => {
+                                    this.localStream.addTrack(track);
+                                });
+                                console.log('✅ Audio captured successfully');
+                            } catch (audioError) {
+                                console.log('⚠️ Could not capture audio:', audioError);
+                                this.showAlertMessage('Audio capture failed. Streaming video only.', 'error');
+                            }
+                        }
+
+                        // Display local video preview
                         const videoElement = document.getElementById('localVideo');
                         videoElement.srcObject = this.localStream;
                         
-                        // Start streaming
+                        // Update state
                         this.isStreaming = true;
                         this.streamStartTime = new Date();
                         
-                        // Notify server
-                        this.socket.emit('stream-started', {
-                            streamId: this.streamId,
-                            name: this.streamName,
-                            type: 'screen'
+                        // Start timers
+                        this.startDurationTimer();
+                        this.startBitrateTimer();
+                        
+                        // Announce as broadcaster
+                        this.socket.emit('set-user-type', {
+                            type: 'broadcaster',
+                            username: this.streamTitle,
+                            streamId: this.streamId
                         });
                         
-                        // Start duration timer
-                        this.startDurationTimer();
+                        this.socket.emit('broadcaster-announce', this.streamId);
                         
                         // Add system message
-                        this.addSystemMessage('Streaming dimulai! Bagikan link dengan penonton.');
+                        this.addSystemMessage('🎬 Streaming started! Share the URL with viewers.');
                         
                         // Show success message
-                        this.showToastMessage('Streaming berhasil dimulai!');
+                        this.showToastMessage('Stream Started', 'Your stream is now live!', 'fa-broadcast-tower');
                         
                         // Handle when user stops sharing via browser UI
-                        this.localStream.getVideoTracks()[0].onended = () => {
-                            this.stopStream();
-                        };
-                        
-                        // Simulate bitrate changes
-                        setInterval(() => {
-                            if (this.isStreaming) {
-                                this.bitrate = `${Math.floor(Math.random() * 2000) + 1000} kbps`;
-                            }
-                        }, 2000);
-                        
+                        const videoTrack = this.localStream.getVideoTracks()[0];
+                        if (videoTrack) {
+                            videoTrack.onended = () => {
+                                console.log('🛑 User stopped sharing via browser UI');
+                                this.stopStream();
+                            };
+                        }
+
                     } catch (error) {
-                        console.error('Error starting stream:', error);
-                        this.showAlertMessage(`Gagal memulai streaming: ${error.message}`, 'error');
+                        console.error('❌ Error starting stream:', error);
+                        
+                        if (error.name === 'NotAllowedError') {
+                            this.showAlertMessage('Permission denied. Please allow screen sharing.', 'error');
+                        } else if (error.name === 'NotFoundError') {
+                            this.showAlertMessage('No screen sharing source found.', 'error');
+                        } else if (error.name === 'NotReadableError') {
+                            this.showAlertMessage('Cannot read from screen source. Try again.', 'error');
+                        } else {
+                            this.showAlertMessage(`Failed to start stream: ${error.message}`, 'error');
+                        }
+                    }
+                },
+
+                createPeerConnection(viewerId) {
+                    try {
+                        console.log('🔗 Creating peer connection for:', viewerId);
+                        
+                        // ICE Server configuration
+                        const configuration = {
+                            iceServers: [
+                                { urls: 'stun:stun.l.google.com:19302' },
+                                { urls: 'stun:stun1.l.google.com:19302' },
+                                { urls: 'stun:stun2.l.google.com:19302' },
+                                { urls: 'stun:stun3.l.google.com:19302' },
+                                { urls: 'stun:stun4.l.google.com:19302' }
+                            ],
+                            iceCandidatePoolSize: 10,
+                            bundlePolicy: 'max-bundle',
+                            rtcpMuxPolicy: 'require'
+                        };
+
+                        // Create peer connection
+                        const peerConnection = new RTCPeerConnection(configuration);
+                        this.peerConnections[viewerId] = peerConnection;
+
+                        // Add all tracks from local stream
+                        this.localStream.getTracks().forEach(track => {
+                            console.log('🎵 Adding track:', track.kind, track.label);
+                            peerConnection.addTrack(track, this.localStream);
+                        });
+
+                        // Handle ICE candidates
+                        peerConnection.onicecandidate = (event) => {
+                            if (event.candidate) {
+                                this.socket.emit('ice-candidate', {
+                                    target: viewerId,
+                                    candidate: event.candidate
+                                });
+                            }
+                        };
+
+                        // Handle connection state
+                        peerConnection.onconnectionstatechange = () => {
+                            console.log(`🔗 Connection state with ${viewerId}:`, peerConnection.connectionState);
+                            
+                            switch(peerConnection.connectionState) {
+                                case 'connected':
+                                    console.log(`✅ Connected to viewer: ${viewerId}`);
+                                    this.showToastMessage('Viewer Connected', 'A viewer joined your stream', 'fa-user-plus');
+                                    break;
+                                case 'disconnected':
+                                case 'failed':
+                                    console.log(`❌ Connection lost with: ${viewerId}`);
+                                    delete this.peerConnections[viewerId];
+                                    this.updateViewerCount();
+                                    break;
+                                case 'closed':
+                                    console.log(`🚪 Connection closed with: ${viewerId}`);
+                                    delete this.peerConnections[viewerId];
+                                    this.updateViewerCount();
+                                    break;
+                            }
+                        };
+
+                        // Handle ICE connection state
+                        peerConnection.oniceconnectionstatechange = () => {
+                            console.log(`🧊 ICE connection state:`, peerConnection.iceConnectionState);
+                        };
+
+                        // Create and send offer
+                        peerConnection.createOffer({
+                            offerToReceiveAudio: true,
+                            offerToReceiveVideo: true,
+                            voiceActivityDetection: false
+                        })
+                        .then(offer => {
+                            console.log('📤 Created offer for:', viewerId);
+                            return peerConnection.setLocalDescription(offer);
+                        })
+                        .then(() => {
+                            this.socket.emit('webrtc-offer', {
+                                target: viewerId,
+                                sdp: peerConnection.localDescription
+                            });
+                            console.log('📤 Sent offer to:', viewerId);
+                        })
+                        .catch(error => {
+                            console.error('❌ Error creating/sending offer:', error);
+                            this.showAlertMessage(`Failed to connect to viewer: ${error.message}`, 'error');
+                        });
+
+                    } catch (error) {
+                        console.error('❌ Error creating peer connection:', error);
+                        this.showAlertMessage(`Failed to create connection: ${error.message}`, 'error');
                     }
                 },
 
                 stopStream() {
+                    console.log('🛑 Stopping stream...');
+                    
+                    // Close all peer connections
+                    Object.keys(this.peerConnections).forEach(viewerId => {
+                        if (this.peerConnections[viewerId]) {
+                            this.peerConnections[viewerId].close();
+                        }
+                    });
+                    this.peerConnections = {};
+                    
+                    // Stop local stream
                     if (this.localStream) {
                         this.localStream.getTracks().forEach(track => track.stop());
                         this.localStream = null;
                     }
                     
+                    // Update state
                     this.isStreaming = false;
+                    this.viewerCount = 0;
                     this.streamDuration = '00:00';
+                    this.bitrate = '0 kbps';
                     
-                    // Notify server
-                    this.socket.emit('stream-stopped');
-                    
-                    // Clear interval
+                    // Clear intervals
                     if (this.durationInterval) {
                         clearInterval(this.durationInterval);
+                        this.durationInterval = null;
+                    }
+                    
+                    if (this.bitrateInterval) {
+                        clearInterval(this.bitrateInterval);
+                        this.bitrateInterval = null;
+                    }
+                    
+                    // Notify server
+                    if (this.socket) {
+                        this.socket.emit('stop-stream');
                     }
                     
                     // Add system message
-                    this.addSystemMessage('Streaming dihentikan.');
+                    this.addSystemMessage('⏹️ Streaming stopped.');
                     
-                    this.showToastMessage('Streaming dihentikan.');
+                    // Show toast
+                    this.showToastMessage('Stream Stopped', 'Your stream has ended', 'fa-stop-circle');
                 },
 
                 startDurationTimer() {
@@ -535,86 +897,108 @@
                         if (this.streamStartTime) {
                             const now = new Date();
                             const diff = Math.floor((now - this.streamStartTime) / 1000);
-                            const minutes = Math.floor(diff / 60);
+                            const hours = Math.floor(diff / 3600);
+                            const minutes = Math.floor((diff % 3600) / 60);
                             const seconds = diff % 60;
-                            this.streamDuration = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                            
+                            if (hours > 0) {
+                                this.streamDuration = `${hours}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                            } else {
+                                this.streamDuration = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                            }
                         }
                     }, 1000);
                 },
 
+                startBitrateTimer() {
+                    this.bitrateInterval = setInterval(() => {
+                        if (this.isStreaming && this.localStream) {
+                            // Simulate bitrate (in real app, calculate from WebRTC stats)
+                            const simulatedBitrate = Math.floor(Math.random() * 1500) + 500;
+                            this.bitrate = `${simulatedBitrate} kbps`;
+                        }
+                    }, 2000);
+                },
+
                 toggleAudio() {
                     this.isAudioEnabled = !this.isAudioEnabled;
+                    
                     if (this.localStream) {
                         this.localStream.getAudioTracks().forEach(track => {
                             track.enabled = this.isAudioEnabled;
                         });
                     }
-                    this.showToastMessage(`Audio ${this.isAudioEnabled ? 'diaktifkan' : 'dimatikan'}`);
+                    
+                    const action = this.isAudioEnabled ? 'enabled' : 'disabled';
+                    this.showToastMessage('Audio ' + action, `Audio ${action} for stream`, 
+                                        this.isAudioEnabled ? 'fa-volume-up' : 'fa-volume-mute');
                 },
 
                 toggleVideo() {
                     this.isVideoEnabled = !this.isVideoEnabled;
+                    
                     if (this.localStream) {
                         this.localStream.getVideoTracks().forEach(track => {
                             track.enabled = this.isVideoEnabled;
                         });
                     }
-                    this.showToastMessage(`Video ${this.isVideoEnabled ? 'diaktifkan' : 'dimatikan'}`);
+                    
+                    const action = this.isVideoEnabled ? 'enabled' : 'disabled';
+                    this.showToastMessage('Video ' + action, `Video ${action} for stream`,
+                                        this.isVideoEnabled ? 'fa-video' : 'fa-video-slash');
+                },
+
+                updateViewerCount() {
+                    this.viewerCount = Object.keys(this.peerConnections).length;
                 },
 
                 shareStream() {
                     if (navigator.share) {
                         navigator.share({
-                            title: this.streamName,
-                            text: 'Tonton stream YouTube Music saya live!',
+                            title: this.streamTitle,
+                            text: 'Watch my YouTube Music live stream!',
                             url: this.streamUrl
+                        }).catch(err => {
+                            console.log('Share cancelled:', err);
                         });
                     } else {
-                        this.copyToClipboard(this.streamUrl);
-                        this.showToastMessage('Link stream disalin ke clipboard!');
+                        this.copyToClipboard(this.streamUrl, 'Stream URL');
                     }
                 },
 
-                copyToClipboard(text) {
-                    navigator.clipboard.writeText(text)
-                        .then(() => {
-                            this.showToastMessage('Berhasil disalin!');
-                        })
-                        .catch(err => {
-                            console.error('Copy failed:', err);
-                            this.showAlertMessage('Gagal menyalin teks', 'error');
-                        });
+                async copyToClipboard(text, label = 'Text') {
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        this.showToastMessage('Copied!', `${label} copied to clipboard`, 'fa-clipboard-check');
+                    } catch (err) {
+                        console.error('Failed to copy:', err);
+                        this.showToastMessage('Copy Failed', 'Could not copy to clipboard', 'fa-exclamation-triangle');
+                    }
                 },
 
                 sendChatMessage() {
-                    if (!this.newMessage.trim()) return;
+                    if (!this.newMessage.trim() || !this.isStreaming) return;
                     
                     const message = {
-                        text: this.newMessage,
+                        message: this.newMessage,
                         streamId: this.streamId,
                         type: 'message'
                     };
                     
+                    // Send to server
                     this.socket.emit('chat-message', message);
                     
-                    // Add to local chat
+                    // Add to local chat (as broadcaster)
                     this.chatMessages.push({
                         id: Date.now(),
-                        username: 'Anda',
+                        username: 'You',
                         message: this.newMessage,
                         timestamp: new Date().toISOString(),
                         type: 'message'
                     });
                     
                     this.newMessage = '';
-                    
-                    // Auto-scroll
-                    setTimeout(() => {
-                        const chatContainer = document.querySelector('.overflow-y-auto');
-                        if (chatContainer) {
-                            chatContainer.scrollTop = chatContainer.scrollHeight;
-                        }
-                    }, 100);
+                    this.scrollChatToBottom();
                 },
 
                 addSystemMessage(message) {
@@ -624,6 +1008,22 @@
                         message: message,
                         timestamp: new Date().toISOString()
                     });
+                    this.scrollChatToBottom();
+                },
+
+                clearChat() {
+                    this.chatMessages = [];
+                    this.addSystemMessage('Chat cleared.');
+                },
+
+                scrollChatToBottom() {
+                    // Scroll to bottom on next tick
+                    setTimeout(() => {
+                        const chatContainer = document.querySelector('.overflow-y-auto');
+                        if (chatContainer) {
+                            chatContainer.scrollTop = chatContainer.scrollHeight;
+                        }
+                    }, 100);
                 },
 
                 showAlertMessage(message, type = 'info') {
@@ -636,8 +1036,10 @@
                     }, 5000);
                 },
 
-                showToastMessage(message) {
+                showToastMessage(title, message, icon = 'fa-info-circle') {
+                    this.toastTitle = title;
                     this.toastMessage = message;
+                    this.toastIcon = icon;
                     this.showToast = true;
                     
                     setTimeout(() => {
@@ -645,9 +1047,35 @@
                     }, 3000);
                 },
 
+                getMessageIcon(message) {
+                    if (message.includes('joined')) return 'fa-user-plus text-green-400';
+                    if (message.includes('started')) return 'fa-play-circle text-blue-400';
+                    if (message.includes('stopped')) return 'fa-stop-circle text-red-400';
+                    if (message.includes('wants to watch')) return 'fa-eye text-purple-400';
+                    if (message.includes('Welcome')) return 'fa-hand-wave text-yellow-400';
+                    return 'fa-info-circle text-gray-400';
+                },
+
                 formatTime(timestamp) {
                     const date = new Date(timestamp);
                     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                },
+
+                toggleSettings() {
+                    this.settingsOpen = !this.settingsOpen;
+                },
+
+                loadSettings() {
+                    const savedTitle = localStorage.getItem('streamTitle');
+                    if (savedTitle) {
+                        this.streamTitle = savedTitle;
+                    }
+                },
+
+                saveSettings() {
+                    localStorage.setItem('streamTitle', this.streamTitle);
+                    this.showToastMessage('Settings Saved', 'Your settings have been saved', 'fa-save');
+                    this.settingsOpen = false;
                 }
             }
         }
