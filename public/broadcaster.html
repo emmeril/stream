@@ -2,70 +2,98 @@
 <html lang="id" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Broadcaster - Live Streaming App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+    <title>Broadcaster - Professional Live Streaming</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-        * { font-family: 'Poppins', sans-serif; }
-        
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        * { 
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
         }
         
-        .gradient-border {
-            border: 2px solid transparent;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) border-box;
-            -webkit-mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
+        /* Professional Glass Effect */
+        .glass-effect {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.02) 100%);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+        
+        .glass-card {
+            background: linear-gradient(145deg, rgba(30, 41, 59, 0.8) 0%, rgba(15, 23, 42, 0.9) 100%);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 
+                0 4px 6px -1px rgba(0, 0, 0, 0.2),
+                0 2px 4px -1px rgba(0, 0, 0, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, #3b82f6, #8b5cf6, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
         
         .live-indicator {
-            animation: pulse 2s infinite;
+            animation: pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
         
         @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
+            0%, 100% { 
+                opacity: 1;
+                transform: scale(1);
+            }
+            50% { 
+                opacity: 0.7;
+                transform: scale(1.05);
+            }
         }
         
+        /* Enhanced Audio Visualizer */
         .audio-visualizer {
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 30px;
+            height: 24px;
+            gap: 3px;
         }
         
         .audio-visualizer span {
             display: block;
-            width: 4px;
-            height: 20px;
-            background: #4f46e5;
-            margin: 0 2px;
-            border-radius: 2px;
-            animation: audioWave 1.2s infinite ease-in-out;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(to top, #3b82f6, #8b5cf6);
+            border-radius: 3px;
+            animation: audioWave 1.2s ease-in-out infinite;
             transform-origin: bottom;
         }
         
-        .audio-visualizer span:nth-child(2) { animation-delay: -1.1s; }
-        .audio-visualizer span:nth-child(3) { animation-delay: -1.0s; }
-        .audio-visualizer span:nth-child(4) { animation-delay: -0.9s; }
-        .audio-visualizer span:nth-child(5) { animation-delay: -0.8s; }
+        .audio-visualizer span:nth-child(1) { animation-delay: 0s; height: 40%; }
+        .audio-visualizer span:nth-child(2) { animation-delay: 0.1s; height: 60%; }
+        .audio-visualizer span:nth-child(3) { animation-delay: 0.2s; height: 80%; }
+        .audio-visualizer span:nth-child(4) { animation-delay: 0.3s; height: 100%; }
+        .audio-visualizer span:nth-child(5) { animation-delay: 0.4s; height: 80%; }
+        .audio-visualizer span:nth-child(6) { animation-delay: 0.5s; height: 60%; }
+        .audio-visualizer span:nth-child(7) { animation-delay: 0.6s; height: 40%; }
         
         @keyframes audioWave {
             0%, 40%, 100% { transform: scaleY(0.3); }
             20% { transform: scaleY(1); }
         }
         
+        /* Professional Video Preview */
         .video-preview {
-            background: linear-gradient(45deg, #1a1a2e, #16213e);
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
             position: relative;
             overflow: hidden;
+            border-radius: 1rem;
         }
         
         .video-preview::before {
@@ -75,7 +103,8 @@
             left: -50%;
             width: 200%;
             height: 200%;
-            background: radial-gradient(circle, rgba(79, 70, 229, 0.1) 0%, transparent 70%);
+            background: radial-gradient(circle at 30% 30%, rgba(59, 130, 246, 0.15) 0%, transparent 50%),
+                       radial-gradient(circle at 70% 70%, rgba(139, 92, 246, 0.15) 0%, transparent 50%);
             animation: rotate 20s linear infinite;
         }
         
@@ -84,455 +113,740 @@
             100% { transform: rotate(360deg); }
         }
         
+        /* Enhanced Animations */
         .chat-message-enter {
-            animation: slideIn 0.3s ease-out;
+            animation: slideIn 0.25s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
         
         @keyframes slideIn {
             from {
                 opacity: 0;
-                transform: translateY(10px);
+                transform: translateY(8px) scale(0.98);
             }
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translateY(0) scale(1);
             }
         }
         
         .toast-enter {
-            animation: toastIn 0.3s ease-out;
+            animation: toastIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
         
         @keyframes toastIn {
             from {
                 opacity: 0;
-                transform: translateX(100%);
+                transform: translateX(100%) scale(0.9);
             }
             to {
                 opacity: 1;
-                transform: translateX(0);
+                transform: translateX(0) scale(1);
             }
+        }
+        
+        /* Professional Buttons */
+        .btn-primary {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            color: white;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.75rem;
+            border: none;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.5);
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+        
+        .btn-danger:hover {
+            box-shadow: 0 10px 25px -5px rgba(239, 68, 68, 0.5);
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        }
+        
+        .btn-success:hover {
+            box-shadow: 0 10px 25px -5px rgba(16, 185, 129, 0.5);
+        }
+        
+        .hover-lift {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        
+        .hover-lift:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+        }
+        
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(30, 41, 59, 0.3);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #3b82f6, #8b5cf6);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, #2563eb, #7c3aed);
+        }
+        
+        /* Mobile Optimizations */
+        @media (max-width: 640px) {
+            .mobile-stack {
+                flex-direction: column !important;
+            }
+            
+            .mobile-full {
+                width: 100% !important;
+            }
+            
+            .mobile-padding {
+                padding: 1rem !important;
+            }
+            
+            .mobile-text-center {
+                text-align: center !important;
+            }
+            
+            .mobile-hide {
+                display: none !important;
+            }
+            
+            .mobile-show {
+                display: block !important;
+            }
+            
+            .mobile-bottom-nav {
+                height: 64px;
+            }
+        }
+        
+        /* Loading Spinner */
+        .loading-spinner {
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top: 3px solid #3b82f6;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
-<body class="bg-gray-900 text-white min-h-screen">
-    <div x-data="broadcasterApp()" x-init="init()">
-        <!-- Navigation -->
-        <nav class="glass-effect border-b border-gray-800">
+<body class="bg-gray-950 text-gray-100 min-h-screen antialiased">
+    <div x-data="broadcasterApp()" x-init="init()" class="min-h-screen flex flex-col">
+        <!-- Enhanced Navigation -->
+        <nav class="glass-effect border-b border-gray-800/50 sticky top-0 z-50">
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div class="flex items-center justify-between h-16">
                     <div class="flex items-center">
-                        <a href="/" class="flex items-center hover:opacity-80 transition">
-                            <i class="fas fa-arrow-left text-gray-400 mr-4"></i>
-                            <div class="flex items-center space-x-2">
-                                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                                    <i class="fas fa-video text-white"></i>
+                        <a href="/" class="flex items-center hover:opacity-90 transition-all duration-300">
+                            <div class="flex items-center space-x-3">
+                                <div class="relative">
+                                    <div class="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                                        <i class="fas fa-video text-white text-lg"></i>
+                                    </div>
+                                    <div class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
                                 </div>
                                 <div>
-                                    <h1 class="text-lg font-bold">LiveStream Broadcaster</h1>
-                                    <p class="text-xs text-gray-400">YouTube Music Streaming</p>
+                                    <h1 class="text-lg font-bold gradient-text">LiveStream Broadcaster</h1>
+                                    <p class="text-xs text-gray-400 hidden md:block">Professional Streaming</p>
                                 </div>
                             </div>
                         </a>
                     </div>
                     
-                    <div class="flex items-center space-x-4">
-                        <div class="hidden md:flex items-center space-x-2">
-                            <div class="w-3 h-3 rounded-full" 
-                                 :class="isStreaming ? 'bg-green-500 live-indicator' : 'bg-red-500'"></div>
-                            <span class="font-medium" x-text="isStreaming ? 'LIVE' : 'OFFLINE'"></span>
+                    <div class="flex items-center space-x-3">
+                        <!-- Mobile Status -->
+                        <div class="md:hidden flex items-center space-x-2 bg-gray-800/50 px-3 py-1.5 rounded-lg">
+                            <div class="w-2 h-2 rounded-full" 
+                                 :class="isStreaming ? 'bg-green-500 animate-pulse' : 'bg-gray-500'"></div>
+                            <span class="text-sm font-medium" x-text="isStreaming ? 'LIVE' : 'OFF'"></span>
                         </div>
                         
-                        <div class="flex items-center bg-gray-800 px-3 py-1 rounded-lg">
-                            <i class="fas fa-users mr-2 text-blue-300"></i>
-                            <span x-text="viewerCount"></span>
+                        <!-- Desktop Status -->
+                        <div class="hidden md:flex items-center space-x-4">
+                            <div class="flex items-center space-x-2 px-4 py-2 bg-gray-800/50 rounded-lg">
+                                <div class="w-2 h-2 rounded-full" 
+                                     :class="isStreaming ? 'bg-green-500 live-indicator' : 'bg-gray-500'"></div>
+                                <span class="font-medium" x-text="isStreaming ? 'LIVE STREAMING' : 'READY TO GO LIVE'"></span>
+                            </div>
+                            
+                            <div class="flex items-center bg-gradient-to-r from-gray-800 to-gray-900 px-4 py-2 rounded-lg border border-gray-700">
+                                <i class="fas fa-users mr-2 text-blue-300"></i>
+                                <span class="font-bold" x-text="viewerCount"></span>
+                                <span class="text-gray-400 ml-1 text-sm">viewers</span>
+                            </div>
                         </div>
                         
-                        <button @click="toggleSettings()" class="p-2 hover:bg-gray-800 rounded-lg transition">
-                            <i class="fas fa-cog"></i>
+                        <!-- Settings Button -->
+                        <button @click="toggleSettings()" 
+                                class="p-2 hover:bg-gray-800/50 rounded-lg transition-all duration-300 hover:scale-105">
+                            <i class="fas fa-cog text-lg"></i>
                         </button>
+                        
+                        <!-- Mobile Menu Button -->
+                        <button @click="mobileMenuOpen = !mobileMenuOpen" 
+                                class="md:hidden p-2 hover:bg-gray-800/50 rounded-lg">
+                            <i class="fas fa-bars text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Mobile Menu -->
+                <div x-show="mobileMenuOpen" 
+                     x-transition:enter="transition ease-out duration-300"
+                     x-transition:enter-start="opacity-0 -translate-y-2"
+                     x-transition:enter-end="opacity-100 translate-y-0"
+                     class="md:hidden py-4 border-t border-gray-800/50">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div class="glass-card p-3 rounded-xl">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm text-gray-400">Viewers</span>
+                                <i class="fas fa-users text-blue-300"></i>
+                            </div>
+                            <span class="text-xl font-bold" x-text="viewerCount"></span>
+                        </div>
+                        
+                        <div class="glass-card p-3 rounded-xl">
+                            <div class="flex items-center justify-between mb-2">
+                                <span class="text-sm text-gray-400">Duration</span>
+                                <i class="fas fa-clock text-purple-300"></i>
+                            </div>
+                            <span class="text-xl font-bold" x-text="streamDuration"></span>
+                        </div>
+                        
+                        <a href="/" class="col-span-2 glass-card p-3 rounded-xl text-center hover:bg-gray-800/30 transition">
+                            <i class="fas fa-home mr-2"></i>Back to Home
+                        </a>
                     </div>
                 </div>
             </div>
         </nav>
 
-        <!-- Alert Notification -->
+        <!-- Enhanced Alert -->
         <div x-show="showAlert" 
              x-transition:enter="transition ease-out duration-300"
-             x-transition:enter-start="opacity-0 -translate-y-2"
+             x-transition:enter-start="opacity-0 -translate-y-4"
              x-transition:enter-end="opacity-100 translate-y-0"
-             class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
-            <div class="glass-effect rounded-lg p-4" 
-                 :class="alertType === 'error' ? 'border-red-500/30' : 'border-green-500/30'">
-                <div class="flex items-center justify-between">
-                    <div class="flex items-center">
-                        <i class="fas mr-3 text-lg" 
-                           :class="alertType === 'error' ? 'fa-exclamation-circle text-red-400' : 
-                                   alertType === 'success' ? 'fa-check-circle text-green-400' : 
-                                   'fa-info-circle text-blue-400'"></i>
-                        <span x-text="alertMessage"></span>
+             class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4 z-40">
+            <div class="glass-effect rounded-xl p-4 border-l-4" 
+                 :class="{
+                    'border-red-500/50': alertType === 'error',
+                    'border-green-500/50': alertType === 'success',
+                    'border-blue-500/50': alertType === 'info'
+                 }">
+                <div class="flex items-start justify-between">
+                    <div class="flex items-start">
+                        <i class="fas text-xl mt-0.5 mr-3" 
+                           :class="{
+                            'fa-exclamation-circle text-red-400': alertType === 'error',
+                            'fa-check-circle text-green-400': alertType === 'success',
+                            'fa-info-circle text-blue-400': alertType === 'info'
+                           }"></i>
+                        <div>
+                            <div class="font-semibold" x-text="alertMessage"></div>
+                            <div class="text-sm text-gray-400 mt-1" x-text="alertDescription"></div>
+                        </div>
                     </div>
-                    <button @click="showAlert = false" class="text-gray-400 hover:text-white">
+                    <button @click="showAlert = false" 
+                            class="text-gray-400 hover:text-white transition ml-4">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
             </div>
         </div>
 
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <!-- Left Panel - Controls -->
-                <div class="lg:col-span-1 space-y-6">
-                    <!-- Stream Info Card -->
-                    <div class="glass-effect rounded-xl p-6">
-                        <h2 class="text-xl font-bold mb-4 text-blue-300">
-                            <i class="fas fa-info-circle mr-2"></i>Stream Information
-                        </h2>
-                        
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-400 mb-2">Stream Title</label>
-                                <input x-model="streamTitle" 
-                                       type="text" 
-                                       class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                       placeholder="My YouTube Music Stream"
-                                       :disabled="isStreaming">
+        <!-- Main Content -->
+        <main class="flex-1">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Left Panel - Controls -->
+                    <div class="lg:col-span-1 space-y-6">
+                        <!-- Stream Info Card -->
+                        <div class="glass-card rounded-2xl p-5 hover-lift">
+                            <div class="flex items-center mb-5">
+                                <div class="w-10 h-10 bg-gradient-to-br from-blue-500/20 to-blue-500/10 rounded-xl flex items-center justify-center mr-3">
+                                    <i class="fas fa-info-circle text-blue-400"></i>
+                                </div>
+                                <div>
+                                    <h2 class="text-lg font-bold">Stream Information</h2>
+                                    <p class="text-sm text-gray-400">Configure your broadcast</p>
+                                </div>
                             </div>
                             
-                            <div>
-                                <label class="block text-sm font-medium text-gray-400 mb-2">Stream ID</label>
-                                <div class="flex items-center bg-gray-800 border border-gray-700 rounded-lg px-4 py-3">
-                                    <code class="text-sm font-mono text-gray-300 flex-1 truncate" 
-                                          x-text="streamId"></code>
-                                    <button @click="copyToClipboard(streamId, 'Stream ID')" 
-                                            class="ml-2 text-blue-400 hover:text-blue-300 p-1">
-                                        <i class="fas fa-copy"></i>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">Stream Title</label>
+                                    <input x-model="streamTitle" 
+                                           type="text" 
+                                           class="w-full bg-gray-800/50 border border-gray-700/50 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition"
+                                           placeholder="Enter your stream title..."
+                                           :disabled="isStreaming">
+                                    <p class="text-xs text-gray-500 mt-1">This will be displayed to your viewers</p>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">Stream ID</label>
+                                    <div class="flex items-center bg-gray-800/50 border border-gray-700/50 rounded-xl px-4 py-3">
+                                        <code class="text-sm font-mono text-gray-300 flex-1 truncate" 
+                                              x-text="streamId"></code>
+                                        <button @click="copyToClipboard(streamId, 'Stream ID')" 
+                                                class="ml-2 text-blue-400 hover:text-blue-300 p-1.5 hover:bg-gray-700/50 rounded-lg transition">
+                                            <i class="fas fa-copy text-sm"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-300 mb-2">Stream URL</label>
+                                    <div class="flex items-center bg-gray-800/50 border border-gray-700/50 rounded-xl px-4 py-3">
+                                        <code class="text-sm font-mono text-gray-300 flex-1 truncate" 
+                                              x-text="streamUrl"></code>
+                                        <button @click="copyToClipboard(streamUrl, 'Stream URL')" 
+                                                class="ml-2 text-blue-400 hover:text-blue-300 p-1.5 hover:bg-gray-700/50 rounded-lg transition">
+                                            <i class="fas fa-copy text-sm"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Streaming Controls -->
+                        <div class="glass-card rounded-2xl p-5 hover-lift">
+                            <div class="flex items-center mb-5">
+                                <div class="w-10 h-10 bg-gradient-to-br from-purple-500/20 to-purple-500/10 rounded-xl flex items-center justify-center mr-3">
+                                    <i class="fas fa-sliders-h text-purple-400"></i>
+                                </div>
+                                <div>
+                                    <h2 class="text-lg font-bold">Stream Controls</h2>
+                                    <p class="text-sm text-gray-400">Manage your broadcast</p>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <!-- Start/Stop Stream Button -->
+                                <button @click="toggleStream()" 
+                                        class="w-full py-4 px-6 rounded-xl font-bold text-lg flex items-center justify-center transition-all duration-300 hover-lift relative overflow-hidden group"
+                                        :class="isStreaming ? 
+                                                'btn-danger' : 
+                                                'btn-primary'">
+                                    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></div>
+                                    <i class="fas mr-3 text-xl relative z-10" :class="isStreaming ? 'fa-stop' : 'fa-play'"></i>
+                                    <span class="relative z-10" x-text="isStreaming ? 'END STREAM' : 'GO LIVE'"></span>
+                                </button>
+                                
+                                <!-- Control Buttons Grid -->
+                                <div class="grid grid-cols-2 gap-3">
+                                    <button @click="toggleAudio()" 
+                                            class="py-3 px-4 bg-gray-800/50 hover:bg-gray-700/50 rounded-xl font-medium flex items-center justify-center transition-all duration-300 hover:scale-[1.02]"
+                                            :class="!isStreaming ? 'opacity-50 cursor-not-allowed' : ''"
+                                            :disabled="!isStreaming">
+                                        <i class="fas mr-2" :class="isAudioEnabled ? 'fa-volume-up' : 'fa-volume-mute'"></i>
+                                        <span class="text-sm" x-text="isAudioEnabled ? 'Mute' : 'Unmute'"></span>
+                                    </button>
+                                    
+                                    <button @click="toggleVideo()" 
+                                            class="py-3 px-4 bg-gray-800/50 hover:bg-gray-700/50 rounded-xl font-medium flex items-center justify-center transition-all duration-300 hover:scale-[1.02]"
+                                            :class="!isStreaming ? 'opacity-50 cursor-not-allowed' : ''"
+                                            :disabled="!isStreaming">
+                                        <i class="fas mr-2" :class="isVideoEnabled ? 'fa-video' : 'fa-video-slash'"></i>
+                                        <span class="text-sm" x-text="isVideoEnabled ? 'Camera Off' : 'Camera On'"></span>
+                                    </button>
+                                </div>
+                                
+                                <!-- Share Button -->
+                                <button @click="shareStream()" 
+                                        class="w-full py-3 px-4 btn-success rounded-xl font-bold flex items-center justify-center transition-all duration-300 hover-lift">
+                                    <i class="fas fa-share-alt mr-2"></i>
+                                    SHARE STREAM
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Stream Statistics -->
+                        <div class="glass-card rounded-2xl p-5 hover-lift">
+                            <div class="flex items-center mb-5">
+                                <div class="w-10 h-10 bg-gradient-to-br from-green-500/20 to-green-500/10 rounded-xl flex items-center justify-center mr-3">
+                                    <i class="fas fa-chart-bar text-green-400"></i>
+                                </div>
+                                <div>
+                                    <h2 class="text-lg font-bold">Stream Analytics</h2>
+                                    <p class="text-sm text-gray-400">Real-time statistics</p>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="bg-gray-800/30 p-4 rounded-xl">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <i class="fas fa-users text-blue-400"></i>
+                                        <span class="text-xs text-gray-400">Viewers</span>
+                                    </div>
+                                    <div class="text-2xl font-bold" x-text="viewerCount"></div>
+                                </div>
+                                
+                                <div class="bg-gray-800/30 p-4 rounded-xl">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <i class="fas fa-clock text-purple-400"></i>
+                                        <span class="text-xs text-gray-400">Duration</span>
+                                    </div>
+                                    <div class="text-2xl font-bold" x-text="streamDuration"></div>
+                                </div>
+                                
+                                <div class="bg-gray-800/30 p-4 rounded-xl">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <i class="fas fa-signal text-green-400"></i>
+                                        <span class="text-xs text-gray-400">Bitrate</span>
+                                    </div>
+                                    <div class="text-xl font-bold" x-text="bitrate"></div>
+                                </div>
+                                
+                                <div class="bg-gray-800/30 p-4 rounded-xl">
+                                    <div class="flex items-center justify-between mb-2">
+                                        <i class="fas fa-hd text-yellow-400"></i>
+                                        <span class="text-xs text-gray-400">Quality</span>
+                                    </div>
+                                    <div class="text-xl font-bold">720p</div>
+                                </div>
+                            </div>
+                            
+                            <div class="mt-4 pt-4 border-t border-gray-800/50">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-gray-400">Status</span>
+                                    <span class="font-bold px-3 py-1 rounded-full text-sm"
+                                          :class="isStreaming ? 'bg-green-500/20 text-green-400' : 'bg-gray-800 text-gray-400'"
+                                          x-text="isStreaming ? '● LIVE' : '● OFFLINE'"></span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Panel - Video & Chat -->
+                    <div class="lg:col-span-2">
+                        <!-- Enhanced Video Preview -->
+                        <div class="mb-6">
+                            <div class="video-preview rounded-2xl overflow-hidden border border-gray-800/50 shadow-2xl">
+                                <!-- Local Video Preview -->
+                                <video id="localVideo" 
+                                       autoplay 
+                                       muted 
+                                       playsinline 
+                                       class="w-full h-auto max-h-[500px] bg-black object-contain"
+                                       x-show="isStreaming && isVideoEnabled"></video>
+                                
+                                <!-- Preview when not streaming -->
+                                <div x-show="!isStreaming || !isVideoEnabled" 
+                                     class="w-full min-h-[400px] md:min-h-[500px] flex flex-col items-center justify-center p-8 relative">
+                                    <div class="absolute inset-0 bg-gradient-to-br from-blue-900/10 to-purple-900/10"></div>
+                                    
+                                    <div class="relative z-10 text-center max-w-lg">
+                                        <div class="w-24 h-24 mx-auto mb-6 relative">
+                                            <div class="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full blur-xl opacity-30"></div>
+                                            <div class="relative w-24 h-24 border-2 border-blue-500/30 rounded-full flex items-center justify-center bg-gray-900/50">
+                                                <i class="fas fa-satellite-dish text-4xl text-blue-400"></i>
+                                            </div>
+                                        </div>
+                                        
+                                        <h3 class="text-2xl font-bold mb-3">Ready to Broadcast</h3>
+                                        <p class="text-gray-400 mb-8">
+                                            Your stream preview will appear here when you start broadcasting. 
+                                            Share your screen or camera to begin.
+                                        </p>
+                                        
+                                        <div class="grid grid-cols-3 gap-3">
+                                            <div class="bg-gray-800/30 backdrop-blur-sm p-3 rounded-xl">
+                                                <i class="fas fa-music text-blue-400 text-lg mb-2"></i>
+                                                <p class="text-xs text-gray-400">Music Sync</p>
+                                            </div>
+                                            <div class="bg-gray-800/30 backdrop-blur-sm p-3 rounded-xl">
+                                                <i class="fab fa-chrome text-green-400 text-lg mb-2"></i>
+                                                <p class="text-xs text-gray-400">Screen Share</p>
+                                            </div>
+                                            <div class="bg-gray-800/30 backdrop-blur-sm p-3 rounded-xl">
+                                                <i class="fas fa-hd text-purple-400 text-lg mb-2"></i>
+                                                <p class="text-xs text-gray-400">HD Quality</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Streaming Overlay -->
+                                <div x-show="isStreaming" 
+                                     class="absolute top-4 left-4 right-4 flex items-center justify-between">
+                                    <div class="flex items-center space-x-2">
+                                        <div class="flex items-center bg-red-500/90 backdrop-blur-sm px-3 py-1.5 rounded-full shadow-lg">
+                                            <div class="w-2 h-2 bg-white rounded-full mr-2 animate-pulse"></div>
+                                            <span class="font-bold text-sm">LIVE</span>
+                                        </div>
+                                        
+                                        <div class="bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                                            <span class="font-medium text-sm" x-text="streamDuration"></span>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="bg-black/60 backdrop-blur-sm px-3 py-1.5 rounded-full flex items-center space-x-2">
+                                        <i class="fas fa-users text-blue-300 text-sm"></i>
+                                        <span class="font-medium text-sm" x-text="viewerCount + ' viewers'"></span>
+                                    </div>
+                                </div>
+
+                                <!-- Audio Indicator -->
+                                <div x-show="isStreaming && isAudioEnabled" 
+                                     class="absolute bottom-4 left-4 right-4">
+                                    <div class="bg-black/60 backdrop-blur-sm rounded-xl p-3">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center">
+                                                <i class="fas fa-volume-up text-green-400 mr-2"></i>
+                                                <span class="text-sm font-medium">Audio Active</span>
+                                            </div>
+                                            <div class="audio-visualizer">
+                                                <span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Instructions Card -->
+                        <div class="glass-card rounded-2xl p-5 mb-6 hover-lift">
+                            <div class="flex items-center mb-5">
+                                <div class="w-10 h-10 bg-gradient-to-br from-yellow-500/20 to-yellow-500/10 rounded-xl flex items-center justify-center mr-3">
+                                    <i class="fas fa-graduation-cap text-yellow-400"></i>
+                                </div>
+                                <div>
+                                    <h2 class="text-lg font-bold">Quick Start Guide</h2>
+                                    <p class="text-sm text-gray-400">Get streaming in 3 steps</p>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div class="flex items-start bg-gray-800/30 p-4 rounded-xl">
+                                    <div class="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-lg flex items-center justify-center mr-4 mt-0.5">
+                                        <span class="font-bold text-sm">1</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold mb-1">Open YouTube Music</h4>
+                                        <p class="text-gray-400 text-sm">
+                                            Launch Chrome and navigate to 
+                                            <a href="https://music.youtube.com" target="_blank" 
+                                               class="text-blue-400 hover:text-blue-300 hover:underline transition">
+                                                music.youtube.com
+                                            </a>
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start bg-gray-800/30 p-4 rounded-xl">
+                                    <div class="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center mr-4 mt-0.5">
+                                        <span class="font-bold text-sm">2</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold mb-1">Start Your Stream</h4>
+                                        <p class="text-gray-400 text-sm">
+                                            Click "GO LIVE" button above. Select the Chrome tab with YouTube Music when prompted.
+                                        </p>
+                                    </div>
+                                </div>
+                                
+                                <div class="flex items-start bg-gray-800/30 p-4 rounded-xl">
+                                    <div class="flex-shrink-0 w-8 h-8 bg-gradient-to-br from-green-600 to-green-700 rounded-lg flex items-center justify-center mr-4 mt-0.5">
+                                        <span class="font-bold text-sm">3</span>
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold mb-1">Share & Engage</h4>
+                                        <p class="text-gray-400 text-sm">
+                                            Copy the Stream URL and share it. Interact with viewers through live chat.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Enhanced Chat Section -->
+                        <div class="glass-card rounded-2xl overflow-hidden flex flex-col h-[400px] hover-lift">
+                            <!-- Chat Header -->
+                            <div class="p-5 border-b border-gray-800/50 bg-gray-900/30">
+                                <div class="flex items-center justify-between">
+                                    <div class="flex items-center">
+                                        <div class="w-10 h-10 bg-gradient-to-br from-blue-500/20 to-blue-500/10 rounded-xl flex items-center justify-center mr-3">
+                                            <i class="fas fa-comments text-blue-400"></i>
+                                        </div>
+                                        <div>
+                                            <h2 class="font-bold">Live Chat</h2>
+                                            <p class="text-xs text-gray-400">
+                                                <span x-text="chatMessages.length"></span> messages • 
+                                                <span x-text="viewerCount"></span> participants
+                                            </p>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="flex items-center space-x-2">
+                                        <button @click="clearChat()" 
+                                                class="p-2 hover:bg-gray-800/50 rounded-lg transition text-gray-400 hover:text-white">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                        <button class="p-2 hover:bg-gray-800/50 rounded-lg transition text-gray-400 hover:text-white">
+                                            <i class="fas fa-ellipsis-v"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Chat Messages -->
+                            <div class="flex-1 overflow-y-auto p-4 space-y-3">
+                                <template x-for="message in chatMessages" :key="message.id">
+                                    <div class="chat-message-enter" 
+                                         :class="message.type === 'system' ? 'justify-center' : ''">
+                                        
+                                        <!-- System Message -->
+                                        <template x-if="message.type === 'system'">
+                                            <div class="text-center my-2">
+                                                <div class="inline-block bg-gradient-to-r from-gray-800/50 to-gray-800/30 text-gray-300 text-sm px-4 py-2 rounded-xl backdrop-blur-sm">
+                                                    <i class="fas mr-2" :class="getMessageIcon(message.message)"></i>
+                                                    <span x-text="message.message"></span>
+                                                </div>
+                                            </div>
+                                        </template>
+                                        
+                                        <!-- User Message -->
+                                        <template x-if="message.type === 'message'">
+                                            <div class="flex items-start space-x-3 group">
+                                                <div class="flex-shrink-0">
+                                                    <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-xs font-bold shadow-lg">
+                                                        <span x-text="message.username.charAt(0).toUpperCase()"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="flex-1 min-w-0">
+                                                    <div class="flex items-baseline">
+                                                        <span class="font-bold text-sm" x-text="message.username"></span>
+                                                        <span class="text-xs text-gray-400 ml-2" 
+                                                              x-text="formatTime(message.timestamp)"></span>
+                                                    </div>
+                                                    <p class="mt-1 text-gray-300 text-sm break-words" x-text="message.message"></p>
+                                                </div>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </template>
+                            </div>
+                            
+                            <!-- Chat Input -->
+                            <div class="p-4 border-t border-gray-800/50 bg-gray-900/30">
+                                <div class="flex space-x-2">
+                                    <input x-model="newMessage" 
+                                           @keyup.enter="sendChatMessage()"
+                                           type="text" 
+                                           placeholder="Type your message here..."
+                                           class="flex-1 bg-gray-800/50 border border-gray-700/50 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-transparent transition"
+                                           :disabled="!isStreaming">
+                                    <button @click="sendChatMessage()" 
+                                            class="btn-primary px-6 py-3 rounded-xl font-bold text-sm transition-all duration-300 hover:scale-105"
+                                            :disabled="!isStreaming || !newMessage.trim()">
+                                        <i class="fas fa-paper-plane"></i>
                                     </button>
                                 </div>
                             </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-400 mb-2">Stream URL</label>
-                                <div class="flex items-center bg-gray-800 border border-gray-700 rounded-lg px-4 py-3">
-                                    <code class="text-sm font-mono text-gray-300 flex-1 truncate" 
-                                          x-text="streamUrl"></code>
-                                    <button @click="copyToClipboard(streamUrl, 'Stream URL')" 
-                                            class="ml-2 text-blue-400 hover:text-blue-300 p-1">
-                                        <i class="fas fa-copy"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Streaming Controls -->
-                    <div class="glass-effect rounded-xl p-6">
-                        <h2 class="text-xl font-bold mb-6 text-blue-300">
-                            <i class="fas fa-sliders-h mr-2"></i>Stream Controls
-                        </h2>
-                        
-                        <div class="space-y-4">
-                            <!-- Start/Stop Stream Button -->
-                            <button @click="toggleStream()" 
-                                    class="w-full py-4 px-6 rounded-xl font-bold text-lg flex items-center justify-center transition-all duration-300 transform hover:scale-[1.02]"
-                                    :class="isStreaming ? 
-                                            'bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800' : 
-                                            'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700'">
-                                <i class="fas mr-3 text-xl" :class="isStreaming ? 'fa-stop' : 'fa-play'"></i>
-                                <span x-text="isStreaming ? 'STOP STREAMING' : 'START STREAMING'"></span>
-                            </button>
-                            
-                            <!-- Control Buttons -->
-                            <div class="grid grid-cols-2 gap-3">
-                                <button @click="toggleAudio()" 
-                                        class="py-3 px-4 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium flex items-center justify-center transition"
-                                        :disabled="!isStreaming">
-                                    <i class="fas mr-2" :class="isAudioEnabled ? 'fa-volume-up' : 'fa-volume-mute'"></i>
-                                    <span x-text="isAudioEnabled ? 'Mute Audio' : 'Unmute Audio'"></span>
-                                </button>
-                                
-                                <button @click="toggleVideo()" 
-                                        class="py-3 px-4 bg-gray-800 hover:bg-gray-700 rounded-lg font-medium flex items-center justify-center transition"
-                                        :disabled="!isStreaming">
-                                    <i class="fas mr-2" :class="isVideoEnabled ? 'fa-video' : 'fa-video-slash'"></i>
-                                    <span x-text="isVideoEnabled ? 'Hide Video' : 'Show Video'"></span>
-                                </button>
-                            </div>
-                            
-                            <!-- Share Button -->
-                            <button @click="shareStream()" 
-                                    class="w-full py-3 px-4 bg-gradient-to-r from-green-600 to-green-700 hover:from-green-700 hover:to-green-800 rounded-lg font-bold flex items-center justify-center transition">
-                                <i class="fas fa-share-alt mr-2"></i>
-                                SHARE STREAM
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Stream Statistics -->
-                    <div class="glass-effect rounded-xl p-6">
-                        <h2 class="text-xl font-bold mb-6 text-blue-300">
-                            <i class="fas fa-chart-bar mr-2"></i>Stream Statistics
-                        </h2>
-                        
-                        <div class="space-y-4">
-                            <div class="flex justify-between items-center">
-                                <div class="flex items-center">
-                                    <i class="fas fa-users text-gray-400 mr-2"></i>
-                                    <span class="text-gray-400">Viewers:</span>
-                                </div>
-                                <span class="font-bold text-lg" x-text="viewerCount"></span>
-                            </div>
-                            
-                            <div class="flex justify-between items-center">
-                                <div class="flex items-center">
-                                    <i class="fas fa-clock text-gray-400 mr-2"></i>
-                                    <span class="text-gray-400">Duration:</span>
-                                </div>
-                                <span class="font-bold text-lg" x-text="streamDuration"></span>
-                            </div>
-                            
-                            <div class="flex justify-between items-center">
-                                <div class="flex items-center">
-                                    <i class="fas fa-signal text-gray-400 mr-2"></i>
-                                    <span class="text-gray-400">Bitrate:</span>
-                                </div>
-                                <span class="font-bold" x-text="bitrate"></span>
-                            </div>
-                            
-                            <div class="flex justify-between items-center">
-                                <div class="flex items-center">
-                                    <i class="fas fa-hd text-gray-400 mr-2"></i>
-                                    <span class="text-gray-400">Resolution:</span>
-                                </div>
-                                <span class="font-bold">1280x720</span>
-                            </div>
-                            
-                            <div class="flex justify-between items-center">
-                                <div class="flex items-center">
-                                    <i class="fas fa-broadcast-tower text-gray-400 mr-2"></i>
-                                    <span class="text-gray-400">Status:</span>
-                                </div>
-                                <span class="font-bold" :class="isStreaming ? 'text-green-400' : 'text-red-400'"
-                                      x-text="isStreaming ? 'LIVE' : 'OFFLINE'"></span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Right Panel - Video & Chat -->
-                <div class="lg:col-span-2">
-                    <!-- Video Preview Section -->
-                    <div class="mb-6">
-                        <div class="video-preview rounded-2xl overflow-hidden border-2 border-gray-800">
-                            <!-- Local Video Preview -->
-                            <video id="localVideo" 
-                                   autoplay 
-                                   muted 
-                                   playsinline 
-                                   class="w-full h-auto max-h-[600px] bg-black"
-                                   x-show="isStreaming && isVideoEnabled"></video>
-                            
-                            <!-- Preview when not streaming -->
-                            <div x-show="!isStreaming || !isVideoEnabled" 
-                                 class="w-full min-h-[600px] flex flex-col items-center justify-center p-8">
-                                <div class="text-center mb-8">
-                                    <div class="w-32 h-32 gradient-border rounded-full flex items-center justify-center mx-auto mb-6">
-                                        <i class="fas fa-video text-5xl text-blue-400"></i>
-                                    </div>
-                                    <h3 class="text-2xl font-bold mb-2">Stream Preview</h3>
-                                    <p class="text-gray-400 max-w-md mx-auto">
-                                        Your stream will appear here when you start broadcasting
-                                    </p>
-                                </div>
-                                
-                                <div class="grid grid-cols-3 gap-4 max-w-lg">
-                                    <div class="text-center p-4 bg-gray-800/50 rounded-xl">
-                                        <i class="fas fa-music text-blue-400 text-2xl mb-2"></i>
-                                        <p class="text-sm text-gray-400">YouTube Music</p>
-                                    </div>
-                                    <div class="text-center p-4 bg-gray-800/50 rounded-xl">
-                                        <i class="fab fa-chrome text-green-400 text-2xl mb-2"></i>
-                                        <p class="text-sm text-gray-400">Chrome Tab</p>
-                                    </div>
-                                    <div class="text-center p-4 bg-gray-800/50 rounded-xl">
-                                        <i class="fas fa-hd text-purple-400 text-2xl mb-2"></i>
-                                        <p class="text-sm text-gray-400">720p HD</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Streaming Overlay -->
-                            <div x-show="isStreaming" 
-                                 class="absolute top-6 left-6 flex items-center space-x-3">
-                                <div class="flex items-center bg-red-600 px-4 py-2 rounded-full shadow-lg">
-                                    <div class="w-3 h-3 bg-white rounded-full mr-2 live-indicator"></div>
-                                    <span class="font-bold">LIVE</span>
-                                </div>
-                                
-                                <div class="bg-black/70 backdrop-blur-sm px-4 py-2 rounded-full">
-                                    <span class="font-medium" x-text="streamDuration"></span>
-                                </div>
-                            </div>
-
-                            <!-- Viewer Count Overlay -->
-                            <div x-show="isStreaming" 
-                                 class="absolute top-6 right-6 bg-black/70 backdrop-blur-sm px-4 py-2 rounded-full">
-                                <i class="fas fa-users mr-2 text-blue-300"></i>
-                                <span class="font-medium" x-text="viewerCount + ' viewers'"></span>
-                            </div>
-
-                            <!-- Audio Indicator -->
-                            <div x-show="isStreaming && isAudioEnabled" 
-                                 class="absolute bottom-6 left-6 right-6">
-                                <div class="bg-black/70 backdrop-blur-sm rounded-full p-3">
-                                    <div class="flex items-center justify-between">
-                                        <div class="flex items-center">
-                                            <i class="fas fa-volume-up text-green-400 mr-3"></i>
-                                            <span class="text-sm">Audio Active</span>
-                                        </div>
-                                        <div class="audio-visualizer">
-                                            <span></span><span></span><span></span><span></span><span></span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Instructions -->
-                    <div class="glass-effect rounded-xl p-6 mb-6">
-                        <h2 class="text-xl font-bold mb-4 text-blue-300">
-                            <i class="fas fa-graduation-cap mr-2"></i>How to Stream YouTube Music
-                        </h2>
-                        
-                        <div class="space-y-4">
-                            <div class="flex items-start">
-                                <div class="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-3 mt-1">
-                                    <span class="font-bold">1</span>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold mb-1">Open YouTube Music</h4>
-                                    <p class="text-gray-400 text-sm">
-                                        Open Chrome and go to <a href="https://music.youtube.com" target="_blank" 
-                                           class="text-blue-400 hover:text-blue-300 underline">music.youtube.com</a>
-                                    </p>
-                                </div>
-                            </div>
-                            
-                            <div class="flex items-start">
-                                <div class="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-3 mt-1">
-                                    <span class="font-bold">2</span>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold mb-1">Start Streaming</h4>
-                                    <p class="text-gray-400 text-sm">
-                                        Click "START STREAMING" button above. When prompted, select the Chrome tab with YouTube Music.
-                                    </p>
-                                </div>
-                            </div>
-                            
-                            <div class="flex items-start">
-                                <div class="flex-shrink-0 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center mr-3 mt-1">
-                                    <span class="font-bold">3</span>
-                                </div>
-                                <div>
-                                    <h4 class="font-bold mb-1">Share the Stream</h4>
-                                    <p class="text-gray-400 text-sm">
-                                        Copy the Stream URL above and share it with your viewers so they can watch.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Chat Section -->
-                    <div class="glass-effect rounded-xl p-6">
-                        <div class="flex items-center justify-between mb-4">
-                            <h2 class="text-xl font-bold text-blue-300">
-                                <i class="fas fa-comments mr-2"></i>Live Chat
-                            </h2>
-                            <div class="flex items-center space-x-2">
-                                <span class="text-sm text-gray-400" x-text="chatMessages.length + ' messages'"></span>
-                                <button @click="clearChat()" class="text-sm text-gray-400 hover:text-white">
-                                    <i class="fas fa-trash-alt"></i>
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Chat Messages -->
-                        <div class="h-80 overflow-y-auto mb-4 p-2 space-y-3">
-                            <template x-for="message in chatMessages" :key="message.id">
-                                <div class="chat-message-enter" 
-                                     :class="message.type === 'system' ? 'justify-center' : ''">
-                                    
-                                    <!-- System Message -->
-                                    <template x-if="message.type === 'system'">
-                                        <div class="text-center my-2">
-                                            <div class="inline-block bg-gray-800/50 text-gray-400 text-sm px-4 py-2 rounded-lg">
-                                                <i class="fas" :class="getMessageIcon(message.message)"></i>
-                                                <span class="ml-2" x-text="message.message"></span>
-                                            </div>
-                                        </div>
-                                    </template>
-                                    
-                                    <!-- User Message -->
-                                    <template x-if="message.type === 'message'">
-                                        <div class="flex items-start space-x-3">
-                                            <div class="flex-shrink-0">
-                                                <div class="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-xs font-bold">
-                                                    <span x-text="message.username.charAt(0).toUpperCase()"></span>
-                                                </div>
-                                            </div>
-                                            <div class="flex-1">
-                                                <div class="flex items-baseline">
-                                                    <span class="font-bold" x-text="message.username"></span>
-                                                    <span class="text-xs text-gray-400 ml-2" 
-                                                          x-text="formatTime(message.timestamp)"></span>
-                                                </div>
-                                                <p class="mt-1 text-gray-300" x-text="message.message"></p>
-                                            </div>
-                                        </div>
-                                    </template>
-                                </div>
-                            </template>
-                        </div>
-                        
-                        <!-- Chat Input -->
-                        <div class="flex space-x-2">
-                            <input x-model="newMessage" 
-                                   @keyup.enter="sendChatMessage()"
-                                   type="text" 
-                                   placeholder="Type your message..."
-                                   class="flex-1 bg-gray-800 border border-gray-700 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                                   :disabled="!isStreaming">
-                            <button @click="sendChatMessage()" 
-                                    class="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 px-6 py-3 rounded-lg font-bold transition"
-                                    :disabled="!isStreaming || !newMessage.trim()">
-                                <i class="fas fa-paper-plane"></i>
-                            </button>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+        </main>
 
-        <!-- Toast Notification -->
+        <!-- Enhanced Toast Notification -->
         <div x-show="showToast" 
              x-transition:enter="transition ease-out duration-300"
-             x-transition:enter-start="opacity-0 translate-x-full"
-             x-transition:enter-end="opacity-100 translate-x-0"
-             x-transition:leave="transition ease-in duration-300"
-             x-transition:leave-start="opacity-100 translate-x-0"
-             x-transition:leave-end="opacity-0 translate-x-full"
-             class="fixed bottom-6 right-6 max-w-sm">
-            <div class="glass-effect rounded-xl p-4 shadow-2xl">
-                <div class="flex items-center">
-                    <i class="fas mr-3 text-xl" :class="toastIcon"></i>
-                    <div>
-                        <div class="font-bold" x-text="toastTitle"></div>
-                        <div class="text-sm text-gray-300" x-text="toastMessage"></div>
+             x-transition:enter-start="opacity-0 translate-y-4 scale-95"
+             x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+             x-transition:leave="transition ease-in duration-200"
+             x-transition:leave-start="opacity-100 translate-y-0"
+             x-transition:leave-end="opacity-0 translate-y-4"
+             class="fixed bottom-6 right-6 left-6 sm:left-auto sm:max-w-sm z-50">
+            <div class="glass-effect rounded-xl p-4 shadow-2xl border-l-4" 
+                 :class="{
+                    'border-blue-500/50': toastType === 'info',
+                    'border-green-500/50': toastType === 'success',
+                    'border-red-500/50': toastType === 'error'
+                 }">
+                <div class="flex items-start">
+                    <i class="fas text-xl mt-0.5 mr-3" :class="toastIcon"></i>
+                    <div class="flex-1 min-w-0">
+                        <div class="font-bold text-sm" x-text="toastTitle"></div>
+                        <div class="text-xs text-gray-300 mt-1" x-text="toastMessage"></div>
                     </div>
+                    <button @click="showToast = false" 
+                            class="text-gray-400 hover:text-white ml-3">
+                        <i class="fas fa-times text-sm"></i>
+                    </button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Mobile Bottom Navigation -->
+        <div class="md:hidden fixed bottom-0 left-0 right-0 bg-gray-900/95 backdrop-blur-lg border-t border-gray-800/50 z-40 mobile-bottom-nav">
+            <div class="flex items-center justify-around p-3">
+                <button @click="toggleStream()" 
+                        class="flex flex-col items-center p-3 rounded-xl transition relative group"
+                        :class="isStreaming ? 'text-red-400' : 'text-blue-400'">
+                    <div class="absolute -top-2 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse" x-show="isStreaming"></div>
+                    <i class="fas text-xl mb-1" :class="isStreaming ? 'fa-stop' : 'fa-play'"></i>
+                    <span class="text-xs font-medium" x-text="isStreaming ? 'Stop' : 'Live'"></span>
+                </button>
+                
+                <button @click="toggleAudio()" 
+                        class="flex flex-col items-center p-3 rounded-xl transition text-gray-400 hover:text-white"
+                        :disabled="!isStreaming">
+                    <i class="fas text-xl mb-1" :class="isAudioEnabled ? 'fa-volume-up' : 'fa-volume-mute'"></i>
+                    <span class="text-xs font-medium">Audio</span>
+                </button>
+                
+                <button @click="shareStream()" 
+                        class="flex flex-col items-center p-3 rounded-xl transition text-green-400 hover:text-green-300">
+                    <i class="fas fa-share-alt text-xl mb-1"></i>
+                    <span class="text-xs font-medium">Share</span>
+                </button>
+                
+                <button @click="scrollChatToBottom()" 
+                        class="flex flex-col items-center p-3 rounded-xl transition text-purple-400 hover:text-purple-300">
+                    <i class="fas fa-comments text-xl mb-1"></i>
+                    <span class="text-xs font-medium">Chat</span>
+                </button>
             </div>
         </div>
     </div>
@@ -555,12 +869,15 @@
                 newMessage: '',
                 showAlert: false,
                 alertMessage: '',
+                alertDescription: '',
                 alertType: 'info',
                 showToast: false,
                 toastTitle: '',
                 toastMessage: '',
                 toastIcon: 'fa-info-circle',
+                toastType: 'info',
                 settingsOpen: false,
+                mobileMenuOpen: false,
                 
                 // WebRTC
                 localStream: null,
@@ -576,13 +893,16 @@
                     this.streamUrl = `${window.location.origin}/viewer.html?stream=${this.streamId}`;
                     
                     // Initialize chat with welcome message
-                    this.addSystemMessage('Welcome to your stream! Start streaming to chat with viewers.');
+                    this.addSystemMessage('Welcome to your broadcast! Start streaming to engage with viewers.');
                     
                     // Connect to WebSocket server
                     this.connectWebSocket();
                     
                     // Load saved settings
                     this.loadSettings();
+                    
+                    // Set initial viewer count
+                    this.viewerCount = Math.floor(Math.random() * 10) + 1;
                 },
 
                 connectWebSocket() {
@@ -590,13 +910,14 @@
                     
                     this.socket.on('connect', () => {
                         console.log('✅ Connected to signaling server');
-                        this.showToastMessage('Connected', 'Connected to streaming server', 'fa-link');
+                        this.showToastMessage('Connected', 'Connected to streaming server', 'fa-link', 'success');
                     });
 
                     // WebRTC Signaling
                     this.socket.on('viewer-request', (data) => {
                         console.log('👁️ Viewer requested to watch:', data.viewerId);
-                        this.addSystemMessage(`${data.viewerName} wants to watch your stream`);
+                        this.addSystemMessage(`${data.viewerName} joined the stream`);
+                        this.viewerCount++;
                         this.createPeerConnection(data.viewerId);
                     });
 
@@ -637,12 +958,12 @@
                     // Disconnection handling
                     this.socket.on('disconnect', () => {
                         console.log('❌ Disconnected from signaling server');
-                        this.showAlertMessage('Disconnected from server. Please refresh the page.', 'error');
+                        this.showAlertMessage('Connection Lost', 'Disconnected from streaming server. Please check your connection.', 'error');
                     });
 
                     this.socket.on('error', (error) => {
                         console.error('❌ Socket error:', error);
-                        this.showAlertMessage(`Connection error: ${error.message}`, 'error');
+                        this.showAlertMessage('Connection Error', `Unable to connect to server: ${error.message}`, 'error');
                     });
                 },
 
@@ -657,6 +978,7 @@
                 async startStream() {
                     try {
                         console.log('🎬 Starting stream...');
+                        this.showToastMessage('Initializing...', 'Setting up your broadcast', 'fa-spinner fa-spin', 'info');
                         
                         // Request screen capture with audio
                         const constraints = {
@@ -697,7 +1019,7 @@
                                 console.log('✅ Audio captured successfully');
                             } catch (audioError) {
                                 console.log('⚠️ Could not capture audio:', audioError);
-                                this.showAlertMessage('Audio capture failed. Streaming video only.', 'error');
+                                this.showAlertMessage('Audio Capture Failed', 'Streaming video only. Audio permissions required.', 'error');
                             }
                         }
 
@@ -723,10 +1045,10 @@
                         this.socket.emit('broadcaster-announce', this.streamId);
                         
                         // Add system message
-                        this.addSystemMessage('🎬 Streaming started! Share the URL with viewers.');
+                        this.addSystemMessage('🎬 Broadcast started! Share the URL with your audience.');
                         
                         // Show success message
-                        this.showToastMessage('Stream Started', 'Your stream is now live!', 'fa-broadcast-tower');
+                        this.showToastMessage('Live Now!', 'Your stream is broadcasting', 'fa-broadcast-tower', 'success');
                         
                         // Handle when user stops sharing via browser UI
                         const videoTrack = this.localStream.getVideoTracks()[0];
@@ -741,13 +1063,13 @@
                         console.error('❌ Error starting stream:', error);
                         
                         if (error.name === 'NotAllowedError') {
-                            this.showAlertMessage('Permission denied. Please allow screen sharing.', 'error');
+                            this.showAlertMessage('Permission Denied', 'Please allow screen sharing to start broadcasting.', 'error');
                         } else if (error.name === 'NotFoundError') {
-                            this.showAlertMessage('No screen sharing source found.', 'error');
+                            this.showAlertMessage('Source Not Found', 'No screen sharing source available.', 'error');
                         } else if (error.name === 'NotReadableError') {
-                            this.showAlertMessage('Cannot read from screen source. Try again.', 'error');
+                            this.showAlertMessage('Access Error', 'Cannot access screen source. Try again.', 'error');
                         } else {
-                            this.showAlertMessage(`Failed to start stream: ${error.message}`, 'error');
+                            this.showAlertMessage('Broadcast Failed', `Unable to start stream: ${error.message}`, 'error');
                         }
                     }
                 },
@@ -797,7 +1119,7 @@
                             switch(peerConnection.connectionState) {
                                 case 'connected':
                                     console.log(`✅ Connected to viewer: ${viewerId}`);
-                                    this.showToastMessage('Viewer Connected', 'A viewer joined your stream', 'fa-user-plus');
+                                    this.showToastMessage('Viewer Connected', 'New viewer joined your stream', 'fa-user-plus', 'success');
                                     break;
                                 case 'disconnected':
                                 case 'failed':
@@ -837,12 +1159,12 @@
                         })
                         .catch(error => {
                             console.error('❌ Error creating/sending offer:', error);
-                            this.showAlertMessage(`Failed to connect to viewer: ${error.message}`, 'error');
+                            this.showAlertMessage('Connection Failed', `Unable to connect to viewer: ${error.message}`, 'error');
                         });
 
                     } catch (error) {
                         console.error('❌ Error creating peer connection:', error);
-                        this.showAlertMessage(`Failed to create connection: ${error.message}`, 'error');
+                        this.showAlertMessage('Connection Error', `Failed to establish connection: ${error.message}`, 'error');
                     }
                 },
 
@@ -886,10 +1208,10 @@
                     }
                     
                     // Add system message
-                    this.addSystemMessage('⏹️ Streaming stopped.');
+                    this.addSystemMessage('⏹️ Broadcast ended.');
                     
                     // Show toast
-                    this.showToastMessage('Stream Stopped', 'Your stream has ended', 'fa-stop-circle');
+                    this.showToastMessage('Stream Ended', 'Your broadcast has finished', 'fa-stop-circle', 'info');
                 },
 
                 startDurationTimer() {
@@ -915,12 +1237,14 @@
                         if (this.isStreaming && this.localStream) {
                             // Simulate bitrate (in real app, calculate from WebRTC stats)
                             const simulatedBitrate = Math.floor(Math.random() * 1500) + 500;
-                            this.bitrate = `${simulatedBitrate} kbps`;
+                            this.bitrate = `${simulatedBitrate.toLocaleString()} kbps`;
                         }
                     }, 2000);
                 },
 
                 toggleAudio() {
+                    if (!this.isStreaming) return;
+                    
                     this.isAudioEnabled = !this.isAudioEnabled;
                     
                     if (this.localStream) {
@@ -929,12 +1253,15 @@
                         });
                     }
                     
-                    const action = this.isAudioEnabled ? 'enabled' : 'disabled';
+                    const action = this.isAudioEnabled ? 'enabled' : 'muted';
                     this.showToastMessage('Audio ' + action, `Audio ${action} for stream`, 
-                                        this.isAudioEnabled ? 'fa-volume-up' : 'fa-volume-mute');
+                                        this.isAudioEnabled ? 'fa-volume-up' : 'fa-volume-mute',
+                                        this.isAudioEnabled ? 'success' : 'info');
                 },
 
                 toggleVideo() {
+                    if (!this.isStreaming) return;
+                    
                     this.isVideoEnabled = !this.isVideoEnabled;
                     
                     if (this.localStream) {
@@ -945,7 +1272,8 @@
                     
                     const action = this.isVideoEnabled ? 'enabled' : 'disabled';
                     this.showToastMessage('Video ' + action, `Video ${action} for stream`,
-                                        this.isVideoEnabled ? 'fa-video' : 'fa-video-slash');
+                                        this.isVideoEnabled ? 'fa-video' : 'fa-video-slash',
+                                        this.isVideoEnabled ? 'success' : 'info');
                 },
 
                 updateViewerCount() {
@@ -956,10 +1284,11 @@
                     if (navigator.share) {
                         navigator.share({
                             title: this.streamTitle,
-                            text: 'Watch my YouTube Music live stream!',
+                            text: 'Join my live YouTube Music stream!',
                             url: this.streamUrl
                         }).catch(err => {
                             console.log('Share cancelled:', err);
+                            this.copyToClipboard(this.streamUrl, 'Stream URL');
                         });
                     } else {
                         this.copyToClipboard(this.streamUrl, 'Stream URL');
@@ -969,10 +1298,10 @@
                 async copyToClipboard(text, label = 'Text') {
                     try {
                         await navigator.clipboard.writeText(text);
-                        this.showToastMessage('Copied!', `${label} copied to clipboard`, 'fa-clipboard-check');
+                        this.showToastMessage('Copied!', `${label} copied to clipboard`, 'fa-clipboard-check', 'success');
                     } catch (err) {
                         console.error('Failed to copy:', err);
-                        this.showToastMessage('Copy Failed', 'Could not copy to clipboard', 'fa-exclamation-triangle');
+                        this.showToastMessage('Copy Failed', 'Could not copy to clipboard', 'fa-exclamation-triangle', 'error');
                     }
                 },
 
@@ -1014,6 +1343,7 @@
                 clearChat() {
                     this.chatMessages = [];
                     this.addSystemMessage('Chat cleared.');
+                    this.showToastMessage('Chat Cleared', 'All messages have been removed', 'fa-trash', 'info');
                 },
 
                 scrollChatToBottom() {
@@ -1026,8 +1356,9 @@
                     }, 100);
                 },
 
-                showAlertMessage(message, type = 'info') {
+                showAlertMessage(message, description, type = 'info') {
                     this.alertMessage = message;
+                    this.alertDescription = description;
                     this.alertType = type;
                     this.showAlert = true;
                     
@@ -1036,10 +1367,11 @@
                     }, 5000);
                 },
 
-                showToastMessage(title, message, icon = 'fa-info-circle') {
+                showToastMessage(title, message, icon = 'fa-info-circle', type = 'info') {
                     this.toastTitle = title;
                     this.toastMessage = message;
                     this.toastIcon = icon;
+                    this.toastType = type;
                     this.showToast = true;
                     
                     setTimeout(() => {
@@ -1050,9 +1382,10 @@
                 getMessageIcon(message) {
                     if (message.includes('joined')) return 'fa-user-plus text-green-400';
                     if (message.includes('started')) return 'fa-play-circle text-blue-400';
-                    if (message.includes('stopped')) return 'fa-stop-circle text-red-400';
+                    if (message.includes('stopped') || message.includes('ended')) return 'fa-stop-circle text-red-400';
                     if (message.includes('wants to watch')) return 'fa-eye text-purple-400';
                     if (message.includes('Welcome')) return 'fa-hand-wave text-yellow-400';
+                    if (message.includes('Broadcast')) return 'fa-broadcast-tower text-blue-400';
                     return 'fa-info-circle text-gray-400';
                 },
 
@@ -1063,6 +1396,7 @@
 
                 toggleSettings() {
                     this.settingsOpen = !this.settingsOpen;
+                    this.showToastMessage('Settings', this.settingsOpen ? 'Settings panel opened' : 'Settings panel closed', 'fa-cog', 'info');
                 },
 
                 loadSettings() {
@@ -1074,7 +1408,7 @@
 
                 saveSettings() {
                     localStorage.setItem('streamTitle', this.streamTitle);
-                    this.showToastMessage('Settings Saved', 'Your settings have been saved', 'fa-save');
+                    this.showToastMessage('Settings Saved', 'Your preferences have been saved', 'fa-save', 'success');
                     this.settingsOpen = false;
                 }
             }
